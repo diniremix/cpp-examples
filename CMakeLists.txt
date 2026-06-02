@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(
-    hello_cpp
-    VERSION 0.1.0
-    LANGUAGES CXX
-)
+project(hello_cpp VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,14 +10,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 
-add_executable(
-    ${PROJECT_NAME}
-    src/main.cpp
+set(COMMON_LIBS
+    fmt::fmt
+    spdlog::spdlog
 )
+
+add_executable(${PROJECT_NAME} src/main.cpp)
 
 target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
-    fmt::fmt
-    spdlog::spdlog
+     ${COMMON_LIBS}
 )
+
+# exercises folder
+file(GLOB EXERCISES "exercises/*.cpp")
+
+foreach(EXERCISE ${EXERCISES})
+    get_filename_component(NAME ${EXERCISE} NAME_WE)
+
+    add_executable(${NAME} ${EXERCISE})
+
+    target_link_libraries(
+        ${NAME}
+        PRIVATE
+        ${COMMON_LIBS}
+    )
+endforeach()
