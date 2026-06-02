@@ -1,12 +1,9 @@
 #pragma once
 
 #include <cmath>
-#include <cstdint>
 #include <cstdio>
 #include <fmt/core.h>
 #include <format>
-#include <iostream>
-#include <ranges>
 #include <string>
 #include <vector>
 
@@ -65,4 +62,18 @@ template <> struct fmt::formatter<Borrows> {
         return std::format_to(ctx.out(), "Borrows{{user_id={}, book_id=\"{}\", borrow_date=\"{}\"}}", b.user_id,
                               b.book_id, b.borrow_date);
     }
+};
+
+struct Library {
+    std::vector<Books> books;
+    std::vector<Users> users;
+    std::vector<Borrows> borrows;
+
+    void add_book(std::string title, std::string author);
+    void add_user(std::string name, std::string email);
+    bool borrow_book(int user_id, int book_id, std::string borrow_date);
+    bool return_book(int book_id);
+    void list_books() const;
+    void list_users() const;
+    void list_borrows() const;
 };
