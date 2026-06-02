@@ -1,8 +1,9 @@
 {
   "name": "hello-cpp",
   "version": "0.1.0",
-  "dependencies": [
-    "fmt",
-    "spdlog"
-  ]
+  "description": "A C++23 examples",
+  "homepage": "https://gitlab.com/homeinside/cpp-examples",
+  "documentation": "https://gitlab.com/homeinside/cpp-examples/",
+  "license": "MIT OR Apache-2.0",
+  "dependencies": ["fmt", "spdlog"]
 }
