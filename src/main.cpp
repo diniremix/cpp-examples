@@ -12,15 +12,19 @@ std::expected<int, std::string> dividir(int a, int b)
 int main()
 {
     spdlog::info("Application started");
-    auto resultado = dividir(10, 2);
+    auto result = dividir(10, 2);
 
-    if (resultado) {
-        // std::println("Resultado: {}", resultado.value()); // C++23
-        // std::print/println
-        fmt::println("Resultado: {}", *resultado); // resultado.value()
+    if (result) {
+        fmt::println("Resultado: {}", result.value());
     } else {
-        // std::println("Error: {}", resultado.error()); // C++23 std::print/println
-        fmt::println("Error: {}", resultado.error());
+        fmt::println("Error: {}", result.error());
+    }
+
+    result = dividir(10, 0);
+    if (!result) {
+        fmt::println("Error: {}", result.error());
+    } else {
+        fmt::println("Resultado: {}", *result); // result.value()
     }
 
     return 0;
