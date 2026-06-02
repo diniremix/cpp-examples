@@ -35,7 +35,7 @@ test pkg:
     clear && cmake --build --preset debug --target {{ pkg }} && ./build/debug/{{ pkg }}
 
 fmt-test:
-    clang-format -i exercises/*.cpp
+    clang-format -i exercises/*.cpp include/*.hpp
 
 clean-d:
     cmake --build --preset debug --target clean
