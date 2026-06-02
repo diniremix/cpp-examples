@@ -55,3 +55,8 @@ rebuild: clean-d build
 
 test-all:
     ctest --test-dir build
+
+[doc("🔍 Git check repo")]
+[group("Git")]
+gitc:
+    git fsck && git gc --prune=now --aggressive && git count-objects -vH
