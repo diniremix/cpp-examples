@@ -10,21 +10,32 @@ configure:
 configure-r:
     cmake --preset release
 
-build: configure
+build:
     # cmake --build build
     cmake --build --preset debug
 
 build-r: configure-r
     cmake --build --preset release -j
 
-release: build-r
-    ./build/{{ PROJECT_NAME }}
-
-run-d:
+run-d: build
     ./build/debug/{{ PROJECT_NAME }}
 
 run-r:
     ./build/release/{{ PROJECT_NAME }}
+
+cc cmd:
+    g++ -std=c++23 src/{{ cmd }}.cpp -o build/{{ cmd }} && ./build/{{ cmd }}
+
+config-test:
+    cmake --preset debug
+    # cmake --build --preset debug
+    # cmake --build --preset debug --target help
+
+test pkg:
+    cmake --build --preset debug --target {{ pkg }} && ./build/debug/{{ pkg }}
+
+fmt-test:
+    clang-format -i exercises/*.cpp
 
 clean-d:
     cmake --build --preset debug --target clean
@@ -40,7 +51,7 @@ fmt:
     # clang-format -i $(shell git ls-files '*.cc' '*.h')
     clang-format -i src/*.cpp
 
-rebuild: clean-d configure build
+rebuild: clean-d build
 
-test:
+test-all:
     ctest --test-dir build
