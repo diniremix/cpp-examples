@@ -12,6 +12,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(uni-algo CONFIG REQUIRED)
+
 
 # target_include_directories(
 #    ${PROJECT_NAME}
@@ -22,6 +24,7 @@ find_package(spdlog CONFIG REQUIRED)
 set(COMMON_LIBS
     fmt::fmt
     spdlog::spdlog
+    uni-algo::uni-algo
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp)
