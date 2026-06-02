@@ -27,12 +27,12 @@ cc cmd:
     g++ -std=c++23 src/{{ cmd }}.cpp -o build/{{ cmd }} && ./build/{{ cmd }}
 
 config-test:
-    cmake --preset debug
+    clear && cmake --preset debug
     # cmake --build --preset debug
     # cmake --build --preset debug --target help
 
 test pkg:
-    cmake --build --preset debug --target {{ pkg }} && ./build/debug/{{ pkg }}
+    clear && cmake --build --preset debug --target {{ pkg }} && ./build/debug/{{ pkg }}
 
 fmt-test:
     clang-format -i exercises/*.cpp
