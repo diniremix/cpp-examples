@@ -15,7 +15,8 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(uni-algo CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(cpr CONFIG REQUIRED)
-
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
+find_package(SQLiteCpp REQUIRED)
 
 # target_include_directories(
 #    ${PROJECT_NAME}
@@ -29,6 +30,8 @@ set(COMMON_LIBS
     uni-algo::uni-algo
     nlohmann_json::nlohmann_json
     cpr::cpr
+    unofficial::sqlite3::sqlite3
+    SQLiteCpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp)

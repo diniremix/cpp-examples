@@ -81,7 +81,7 @@ int main()
     fmt::println("");
     fmt::println("method: POST usando structs");
 
-    User user = {"John", "/pictures/avatars/user1.png", true, 30};
+    User user{"John", "/pictures/avatars/user1.png", true, 30};
     json ju = user;
 
     cpr::Response resp_post_s = cpr::Post(cpr::Url{"https://httpbin.org/post"}, cpr::Body{ju.dump()},
