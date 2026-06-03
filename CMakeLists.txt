@@ -13,6 +13,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(uni-algo CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(cpr CONFIG REQUIRED)
 
 
 # target_include_directories(
@@ -25,6 +27,8 @@ set(COMMON_LIBS
     fmt::fmt
     spdlog::spdlog
     uni-algo::uni-algo
+    nlohmann_json::nlohmann_json
+    cpr::cpr
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp)
