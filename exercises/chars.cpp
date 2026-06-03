@@ -33,7 +33,14 @@ int main()
     fmt::println("");
 
     // emojis
+    fmt::println("😆😊😎🥳👾😈🤡💀💩🙊🙉🙈💯💥");
+    fmt::println("'El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña ¡tocaba el saxofón detrás del "
+                 "palenque de paja!.'");
+    fmt::println("");
+
     std::u32string text = U"😆😊😎🥳👾😈🤡💀💩🙊🙉🙈💯💥";
+    // error al imprimir
+    // fmt::println("{}", text);
 
     for (char32_t cp : text) {
         auto utf8_char = una::utf32to8(std::u32string(1, cp));
