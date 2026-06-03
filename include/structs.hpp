@@ -21,7 +21,7 @@ template <> struct fmt::formatter<Users> {
 
     auto format(const Users& b, fmt::format_context& ctx) const
     {
-        return std::format_to(ctx.out(), "Users{{id={}, name=\"{}\", email=\"{}\"}}", b.id, b.name, b.email);
+        return fmt::format_to(ctx.out(), "Users{{id={}, name=\"{}\", email=\"{}\"}}", b.id, b.name, b.email);
     }
 };
 
@@ -40,7 +40,7 @@ template <> struct fmt::formatter<Books> {
 
     auto format(const Books& b, fmt::format_context& ctx) const
     {
-        return std::format_to(ctx.out(), "Books{{id={}, title=\"{}\", author=\"{}\", available={}}}", b.id, b.title,
+        return fmt::format_to(ctx.out(), "Books{{id={}, title=\"{}\", author=\"{}\", available={}}}", b.id, b.title,
                               b.author, b.available);
     }
 };
