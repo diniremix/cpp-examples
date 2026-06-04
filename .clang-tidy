@@ -1,0 +1,16 @@
+Checks: >
+
+Checks: >
+  bugprone-*,
+  modernize-*,
+  performance-*,
+  cppcoreguidelines-*,
+
+  -fuchsia-trailing-return,
+  -readability-identifier-length,
+  -cppcoreguidelines-avoid-magic-numbers,
+
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-owning-memory,
+  -readability-magic-numbers,
+  -bugprone-exception-escape
