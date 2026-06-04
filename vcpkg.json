@@ -5,5 +5,14 @@
   "homepage": "https://gitlab.com/homeinside/cpp-examples",
   "documentation": "https://gitlab.com/homeinside/cpp-examples/",
   "license": "MIT OR Apache-2.0",
-  "dependencies": ["fmt", "spdlog", "uni-algo", "nlohmann-json", "cpr", "sqlite3", "sqlitecpp"]
+  "dependencies": [
+    "cpr",
+    "fmt",
+    "nlohmann-json",
+    "spdlog",
+    "sqlite3",
+    "sqlitecpp",
+    "uni-algo",
+    "cli11"
+  ]
 }
