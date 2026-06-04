@@ -7,13 +7,26 @@
 using json = nlohmann::json; // Alias para facilitar su uso
 
 struct Weather {
-    std::string tz;
-    std::string temp;
-    std::string temp_feels;
-    std::string humidity;
-    std::string wind;
+    std::string timezone;
+    std::string timezone_abbr;
+    float temperature;
+    float feels_like;
+    int humidity;
+    float wind_speed;
+    float dew_point;
+    float pressure;
+    int cloud_cover;
+    float visibility;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Weather, tz, temp, temp_feels, humidity, wind);
+    std::string temp_unit;
+    std::string humid_unit;
+    std::string wind_unit;
+    std::string pressure_unit;
+    std::string visibility_unit;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(Weather, timezone, temperature, feels_like, humidity, wind_speed, dew_point,
+                                   pressure, cloud_cover, visibility, temp_unit, humid_unit, wind_unit, pressure_unit,
+                                   visibility_unit);
 };
 
 template <> struct fmt::formatter<Weather> {
@@ -141,17 +154,33 @@ std::expected<Weather, std::string> make_resp(const ResponseJson& response)
 
     Weather weather;
 
-    weather.tz = response.timezone.value_or("Unknown");
+    weather.timezone = response.timezone.value_or("Unknown");
+    weather.timezone_abbr = response.timezone_abbreviation.value_or("Unknown");
+    weather.temperature = current.temperature_2m.value_or(0.0f);
+    weather.feels_like = current.apparent_temperature.value_or(0.0f);
+    weather.humidity = current.relative_humidity_2m.value_or(0);
+    weather.wind_speed = current.windspeed_10m.value_or(0.0f);
+    weather.dew_point = current.dewpoint_2m.value_or(0.0f);
+    weather.pressure = current.surface_pressure.value_or(0.0f);
+    weather.cloud_cover = current.cloudcover.value_or(0);
 
-    weather.temp = fmt::format("{}{}", current.temperature_2m.value_or(0.0f), units.temperature_2m.value_or(""));
+    float visibility = current.visibility.value_or(0.0f);
 
-    weather.temp_feels = fmt::format("Feels like {}{}", current.apparent_temperature.value_or(0.0f),
-                                     units.apparent_temperature.value_or(""));
+    if (visibility > 1000) {
+        weather.visibility = visibility / 1000;
+        weather.visibility_unit = "km";
+    } else if (visibility > 0 && visibility < 1000) {
+        weather.visibility = visibility;
+        weather.visibility_unit = "m";
+    } else {
+        weather.visibility = visibility;
+        weather.visibility_unit = units.visibility.value_or("");
+    }
 
-    weather.humidity =
-        fmt::format("Humidity {}{}", current.relative_humidity_2m.value_or(0), units.relative_humidity_2m.value_or(""));
-
-    weather.wind = fmt::format("Wind {} {}", current.windspeed_10m.value_or(0.0f), units.windspeed_10m.value_or(""));
+    weather.temp_unit = units.apparent_temperature.value_or("");
+    weather.humid_unit = units.relative_humidity_2m.value_or("");
+    weather.wind_unit = units.windspeed_10m.value_or("");
+    weather.pressure_unit = units.surface_pressure.value_or("");
 
     return weather;
 }
@@ -178,7 +207,6 @@ std::expected<Weather, std::string> current_weather(Coordinates coords, std::str
     };
 
     cpr::Response resp_get = cpr::Get(base_uri, params);
-    fmt::println("");
     // fmt::println("GET resp url: {}", resp_get.url.str());
     fmt::println("GET resp status_code: {}", resp_get.status_code);
     // fmt::println("GET resp text: {}", resp_get.text);
@@ -225,11 +253,15 @@ int main()
         auto result_weather = result.value();
 
         fmt::println("Resume:");
-        fmt::println("{}", result_weather.tz);
-        fmt::println("{}", result_weather.temp);
-        fmt::println("{}", result_weather.temp_feels);
-        fmt::println("{}", result_weather.humidity);
-        fmt::println("{}", result_weather.wind);
+        fmt::println("{}({})", result_weather.timezone, result_weather.timezone_abbr);
+        fmt::println("temp {}{}", result_weather.temperature, result_weather.temp_unit);
+        fmt::println("Feels like {}{}", result_weather.feels_like, result_weather.temp_unit);
+        fmt::println("Humidity {}{}", result_weather.humidity, result_weather.humid_unit);
+        fmt::println("Wind {} {}", result_weather.wind_speed, result_weather.wind_unit);
+        fmt::println("Dew point {}{}", result_weather.dew_point, result_weather.temp_unit);
+        fmt::println("Pressure {} {}", result_weather.pressure, result_weather.pressure_unit);
+        fmt::println("Cloud cover {}{}", result_weather.cloud_cover, result_weather.humid_unit);
+        fmt::println("Visibility {} {}", result_weather.visibility, result_weather.visibility_unit);
     }
 
     return 0;
