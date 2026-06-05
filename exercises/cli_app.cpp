@@ -43,29 +43,31 @@ int main(int argc, char** argv)
     auto* config_validate = cmd_config->add_subcommand("validate", "validate configuration file");
 
     //
-    // ==============
-    //
+    // para comando sencillos usar `if (*cmd_xxx)`
 
-    /*if (*cmd_gen) {
+    /*
+    if (*cmd_gen) {
         fmt::println("Generating '{}' (dry-run={})", gen_target, dry_run);
-    }*/
-    cmd_gen->callback([&]() { fmt::println("Generating '{}' (dry-run={})", gen_target, dry_run); });
-
-    /*if (*cmd_test) {
+    }
+    if (*cmd_test) {
         fmt::println("Testing '{}'", test_target);
-    }*/
-    cmd_test->callback([&]() { fmt::println("Testing '{}'", test_target); });
-
-    /*if (*config_create) {
+    }
+    if (*config_create) {
         fmt::println("Creating config");
-    }*/
-    config_create->callback([&]() { fmt::println("Creating config"); });
-
-    /*if (*config_validate) {
+    }
+    if (*config_validate) {
         fmt::println("Validating config");
-    }*/
+    }
+    */
+
+    // si crece mucho usar el modo callback
+
+    cmd_gen->callback([&]() { fmt::println("Generating '{}' (dry-run={})", gen_target, dry_run); });
+    cmd_test->callback([&]() { fmt::println("Testing '{}'", test_target); });
+    config_create->callback([&]() { fmt::println("Creating config"); });
     config_validate->callback([&]() { fmt::println("Validating config"); });
 
     CLI11_PARSE(app, argc, argv);
+
     return 0;
 }
