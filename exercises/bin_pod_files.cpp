@@ -6,9 +6,10 @@
 namespace fs = std::filesystem;
 
 // https://www.geeksforgeeks.org/cpp/pod-type-in-cpp/
+// estructuras con solo tipos básicos y arreglos fijos)
 
 struct PersonPOD {
-    char name[100]; // Arreglo fijo en lugar de string
+    char name[100]; // Arreglo fijo en lugar de std::string
     std::uint32_t age;
     bool edge;
 };
@@ -21,6 +22,7 @@ int main()
 
     fmt::println("usando POD(Plain Old Data)");
     PersonPOD person_pod{"Peter", 456, true};
+
     fmt::println("name={}, age={}, edge={}", person_pod.name, person_pod.age, person_pod.edge);
     fmt::println("");
 
