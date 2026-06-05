@@ -564,3 +564,7 @@ build/*
 build_*/*
 vcpkg*/*
 test/*
+
+# example files
+*_text_file.txt
+*.csv
