@@ -568,3 +568,4 @@ test/*
 # example files
 *_text_file.txt
 *.csv
+*_example.bin

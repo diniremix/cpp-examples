@@ -47,6 +47,11 @@ clean-d:
 clean-r:
     cmake --build --preset release --target clean
 
+clean:
+    rm -fv *.bin
+    rm -fv *.csv
+    rm -fv *_text_file.txt
+
 clean-all:
     # rm -rf build
     rm -rf build/debug/* build/release/*
