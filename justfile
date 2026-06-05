@@ -8,7 +8,7 @@ configure:
     cmake --preset debug
 
 configure-r:
-    cmake --preset release
+    cmake --fresh --preset release
 
 build:
     # cmake --build build
@@ -53,7 +53,7 @@ clean-all:
 
 fmt:
     # clang-format -i $(shell git ls-files '*.cc' '*.h')
-    clang-format -i src/*.cpp
+    clang-format -i include/*.hpp src/*.cpp --Werror
 
 rebuild: clean-d build
 
