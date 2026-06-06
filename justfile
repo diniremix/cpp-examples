@@ -26,9 +26,15 @@ run-r:
 cc cmd:
     g++ -std=c++23 src/{{ cmd }}.cpp -o build/{{ cmd }} && ./build/{{ cmd }}
 
+config-ninja:
+    cmake --preset ninjad
+
 config-test:
     # clear && cmake --preset debug
     cmake --preset debug
+
+build-ninja:
+    cmake --build --preset ninjad -j
 
 build-test:
     # cmake --build --preset debug --target help
@@ -38,8 +44,14 @@ test pkg:
     # clear && cmake --build --preset debug --target {{ pkg }} && ./build/debug/{{ pkg }}
     cmake --build --preset debug --target {{ pkg }} && ./build/debug/{{ pkg }}
 
+ninja pkg:
+    cmake --build --preset ninjad --target {{ pkg }} && ./build/ninjad/{{ pkg }}
+
 fmt-test:
     clang-format -i exercises/*.cpp include/*.hpp
+
+clean-n:
+    cmake --build --preset ninjad --target clean
 
 clean-d:
     cmake --build --preset debug --target clean
@@ -53,9 +65,8 @@ clean:
     rm -fv *_text_file.txt
     rm -rfv logs/
 
-clean-all:
-    # rm -rf build
-    rm -rf build/debug/* build/release/*
+clean-all: clean
+    rm -rf build/debug/* build/release/* build/ninjad/*
 
 fmt:
     # clang-format -i $(shell git ls-files '*.cc' '*.h')
