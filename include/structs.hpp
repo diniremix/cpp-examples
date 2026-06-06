@@ -59,7 +59,7 @@ template <> struct fmt::formatter<Borrows> {
 
     auto format(const Borrows& b, fmt::format_context& ctx) const
     {
-        return std::format_to(ctx.out(), "Borrows{{user_id={}, book_id=\"{}\", borrow_date=\"{}\"}}", b.user_id,
+        return fmt::format_to(ctx.out(), "Borrows{{user_id={}, book_id=\"{}\", borrow_date=\"{}\"}}", b.user_id,
                               b.book_id, b.borrow_date);
     }
 };
