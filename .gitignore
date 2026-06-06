@@ -569,3 +569,4 @@ test/*
 *_text_file.txt
 *.csv
 *_example.bin
+logs/*

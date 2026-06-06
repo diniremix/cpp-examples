@@ -51,6 +51,7 @@ clean:
     rm -fv *.bin
     rm -fv *.csv
     rm -fv *_text_file.txt
+    rm -rfv logs/
 
 clean-all:
     # rm -rf build
