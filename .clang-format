@@ -2,6 +2,8 @@ BasedOnStyle: LLVM
 IndentWidth: 4
 Language: Cpp
 TabWidth: 4
+IndentPPDirectives: BeforeHash
+# ContinuationIndentWidth:4
 UseTab: Never
 ColumnLimit: 120
 AccessModifierOffset: -2
@@ -29,3 +31,10 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SpacesInAngles: false
 SpacesInContainerLiterals: false
+# =========
+# ContinuationIndentWidth: 4
+# NamespaceIndentation: None
+# AccessModifierOffset: -4
+# BreakBeforeBraces: Allman
+# AllowShortFunctionsOnASingleLine: None
+# AllowShortIfStatementsOnASingleLine: Never

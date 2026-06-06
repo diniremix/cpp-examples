@@ -3,21 +3,21 @@
 #include <fmt/core.h>
 
 #ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#pragma comment(lib, "ws2_32.lib")
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    #pragma comment(lib, "ws2_32.lib")
+
 using socket_t = SOCKET;
 constexpr socket_t INVALID_SOCKET_VAL = INVALID_SOCKET;
-#
 #else
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <unistd.h>
+    #include <arpa/inet.h>
+    #include <sys/socket.h>
+    #include <unistd.h>
+
 using socket_t = int;
 constexpr socket_t INVALID_SOCKET_VAL = -1;
-#define SOCKET_ERROR -1
-#define closesocket close
-#
+    #define SOCKET_ERROR -1
+    #define closesocket close
 #endif
 
 constexpr const char* ADDRESS = "127.0.0.1";
@@ -32,6 +32,7 @@ void cleanup_sockets()
 
 int main()
 {
+
 #ifdef _WIN32
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {

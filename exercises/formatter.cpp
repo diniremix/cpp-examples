@@ -14,7 +14,8 @@ struct Punto {
 
 // utilizar std::print
 #ifdef __cpp_lib_print
-#include <print>
+    #include <print>
+
 template <> struct std::formatter<Punto> {
     constexpr auto parse(std::format_parse_context& ctx)
     {
@@ -29,8 +30,9 @@ template <> struct std::formatter<Punto> {
 #endif
 
 #ifdef FMT_VERSION
-#include <fmt/core.h>
-#include <fmt/ostream.h>
+    #include <fmt/core.h>
+    #include <fmt/ostream.h>
+
 // usa ostream_formatter
 template <> struct fmt::formatter<Punto> : fmt::ostream_formatter {
 };
@@ -51,6 +53,7 @@ template <> struct std::formatter<Punto> {
 
 int main()
 {
+
 #ifdef FMT_VERSION
     Books new_book = {1, "1984", "George Orwell"};
     fmt::println("utilizando fmt::formatter (implementado en 'structs.hpp')");
