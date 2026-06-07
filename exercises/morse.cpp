@@ -194,9 +194,7 @@ namespace morse {
             auto morse = find_morse(cp);
 
             if (!morse) {
-
                 errors.push_back(unicode::to_utf8(std::u32string{cp}));
-
                 continue;
             }
 
@@ -204,7 +202,7 @@ namespace morse {
         }
 
         if (!errors.empty()) {
-
+            fmt::println("normal text: '{}'", utils::join(result, " "));
             return std::unexpected(std::format("unsupported characters: {}", utils::join(errors)));
         }
 
@@ -220,7 +218,6 @@ int main()
                        "del palenque de paja!.";
     fmt::println("normal text: '{}'", text);
 
-    /*
     auto result_enc = morse::encode(text);
     if (!result_enc) {
         fmt::println(stderr, "encode error: {}", result_enc.error());
@@ -229,6 +226,7 @@ int main()
         fmt::println("{}", *result_enc);
     }
 
+    /*
     auto result_dec = decode(*result_enc);
     if (!result_dec) {
         fmt::println(stderr, "decode error: {}", result_dec.error());
