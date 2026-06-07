@@ -129,6 +129,59 @@ namespace utils {
 
 } // namespace utils
 
+namespace morse {
+
+    struct MorseEntry {
+        char32_t character;
+        std::string_view morse;
+    };
+
+    constexpr std::array morse_table{
+        MorseEntry{U'a', "._"},    MorseEntry{U'b', "_..."},  MorseEntry{U'c', "_._."},
+        MorseEntry{U'd', "_.."},   MorseEntry{U'e', "."},
+
+        MorseEntry{U'á', ".__._"}, MorseEntry{U'é', ".._.."}, MorseEntry{U'ñ', "__.__"},
+
+        MorseEntry{U'0', "_____"}, MorseEntry{U'1', ".____"},
+
+        MorseEntry{U' ', "/"},
+    };
+
+    std::string_view get_morse(char32_t ch)
+    {
+        for (const auto& entry : morse_table) {
+            if (entry.character == ch) {
+                return entry.morse;
+            }
+        }
+
+        return "#";
+    }
+
+    char32_t get_character(std::string_view morse)
+    {
+        for (const auto& entry : morse_table) {
+            if (entry.morse == morse) {
+                return entry.character;
+            }
+        }
+
+        return U'#';
+    }
+
+    std::optional<std::string_view> find_morse(char32_t ch)
+    {
+        for (const auto& entry : morse_table) {
+            if (entry.character == ch) {
+                return entry.morse;
+            }
+        }
+
+        return std::nullopt;
+    }
+
+} // namespace morse
+
 int main()
 {
 
