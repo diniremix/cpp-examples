@@ -180,6 +180,37 @@ namespace morse {
         return std::nullopt;
     }
 
+    std::expected<std::string, std::string> encode(std::string_view input)
+    {
+        auto normalized = unicode::normalize(unicode::to_lower(input));
+
+        auto text32 = unicode::to_utf32(normalized);
+
+        std::vector<std::string> result;
+        std::vector<std::string> errors;
+
+        for (char32_t cp : text32) {
+
+            auto morse = find_morse(cp);
+
+            if (!morse) {
+
+                errors.push_back(unicode::to_utf8(std::u32string{cp}));
+
+                continue;
+            }
+
+            result.emplace_back(*morse);
+        }
+
+        if (!errors.empty()) {
+
+            return std::unexpected(std::format("unsupported characters: {}", utils::join(errors)));
+        }
+
+        return utils::join(result, " ");
+    }
+
 } // namespace morse
 
 int main()
