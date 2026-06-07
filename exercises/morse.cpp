@@ -7,9 +7,50 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <uni_algo/all.h>
 #include <unordered_map>
 #include <vector>
+
+namespace unicode {
+    std::string to_lower(std::string_view text)
+    {
+        return una::cases::to_lowercase_utf8(text);
+    }
+
+    std::string to_upper(std::string_view text)
+    {
+        return una::cases::to_uppercase_utf8(text);
+    }
+
+    std::string normalize(std::string_view text)
+    {
+        return una::norm::to_nfc_utf8(text);
+    }
+    std::u32string to_utf32(std::string_view text)
+    {
+        // return una::utf8to32(text);
+
+        /*
+        std::wstring wide_string = una::utf8to32(text);
+        std::u32string utf32_string;
+
+        // Convertir cada wchar_t a char32_t
+        for (const auto& wc : wide_string) {
+            utf32_string.push_back(static_cast<char32_t>(wc));
+        }
+
+        return utf32_string;
+        */
+        auto wide = una::utf8to32(text);
+        std::u32string result(wide.begin(), wide.end());
+        return result;
+    }
+    std::string to_utf8(const std::u32string& text)
+    {
+        return una::utf32to8(text);
+    }
+} // namespace unicode
 
 namespace utils {
     template <std::ranges::input_range R>
@@ -88,32 +129,15 @@ namespace utils {
 
 } // namespace utils
 
-struct MorseEntry {
-    char32_t character;
-    std::string_view morse;
-};
-
-constexpr std::array morse_table{
-    MorseEntry{U'a', "._"},
-    MorseEntry{U'b', "_..."},
-    MorseEntry{U'c', "_._."},
-};
-
 int main()
 {
 
     std::string text = "El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña ¡tocaba el saxofón detrás "
                        "del palenque de paja!.";
     fmt::println("normal text: '{}'", text);
-    // fmt::println("normal text: '{}'", utils::to_upper_ascii(text));
-    // fmt::println("normal text: '{}'", utils::to_lower_ascii(text));
-    // fmt::println("normal text: '{}'", utils::trim(" , a -- a "));
-    /*auto result_split = utils::split("a::b::c", "::");
-    for (const auto& token : result_split) {
-        fmt::println("{}", token);
-    }*/
 
-    /*auto result_enc = encode(text);
+    /*
+    auto result_enc = morse::encode(text);
     if (!result_enc) {
         fmt::println(stderr, "encode error: {}", result_enc.error());
         return 1;
