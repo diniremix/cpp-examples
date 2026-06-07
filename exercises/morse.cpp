@@ -246,13 +246,16 @@ int main()
                        "del palenque de paja!.";
     fmt::println("normal text: '{}'", text);
 
-    auto result_enc = morse::encode(text);
+    /*auto result_enc = morse::encode(text);
     if (!result_enc) {
         fmt::println(stderr, "encode error: {}", result_enc.error());
         return 1;
     } else {
         fmt::println("morse result: '{}'", *result_enc);
-    }
+    }*/
+    fmt::println("'ñ' -> {}", morse::encode("ñ").value());
+    fmt::println("'ó' -> {}", morse::encode("ó").value());
+    fmt::println("'á' -> {}", morse::encode("á").value());
 
     /*
     auto result_dec = decode(*result_enc);
