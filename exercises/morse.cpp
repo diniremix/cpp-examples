@@ -27,25 +27,14 @@ namespace unicode {
     {
         return una::norm::to_nfc_utf8(text);
     }
+
     std::u32string to_utf32(std::string_view text)
     {
-        // return una::utf8to32(text);
-
-        /*
-        std::wstring wide_string = una::utf8to32(text);
-        std::u32string utf32_string;
-
-        // Convertir cada wchar_t a char32_t
-        for (const auto& wc : wide_string) {
-            utf32_string.push_back(static_cast<char32_t>(wc));
-        }
-
-        return utf32_string;
-        */
         auto wide = una::utf8to32(text);
         std::u32string result(wide.begin(), wide.end());
         return result;
     }
+
     std::string to_utf8(const std::u32string& text)
     {
         return una::utf32to8(text);
@@ -77,14 +66,12 @@ namespace utils {
     std::string to_lower_ascii(std::string s)
     {
         std::ranges::transform(s, s.begin(), [](unsigned char c) { return std::tolower(c); });
-
         return s;
     }
 
     std::string to_upper_ascii(std::string s)
     {
         std::ranges::transform(s, s.begin(), [](unsigned char c) { return std::toupper(c); });
-
         return s;
     }
 
@@ -120,33 +107,19 @@ namespace utils {
             }
 
             result.emplace_back(text.substr(start, pos - start));
-
             start = pos + delimiter.size();
         }
 
         return result;
     }
-
 } // namespace utils
 
 namespace morse {
-
     struct MorseEntry {
         char32_t character;
         std::string_view morse;
     };
 
-    /*
-    constexpr std::array morse_table{
-        MorseEntry{U'a', "._"},    MorseEntry{U'b', "_..."},  MorseEntry{U'c', "_._."},
-        MorseEntry{U'd', "_.."},   MorseEntry{U'e', "."},
-
-        MorseEntry{U'á', ".__._"}, MorseEntry{U'é', ".._.."}, MorseEntry{U'ñ', "__.__"},
-
-        MorseEntry{U'0', "_____"}, MorseEntry{U'1', ".____"},
-
-        MorseEntry{U' ', "/"},
-    };*/
     // Definición de la tabla Morse
     constexpr std::array<MorseEntry, 94> morse_table{
         MorseEntry{U'a', "._"},     MorseEntry{U'á', "..__._"},  MorseEntry{U'b', "_..."},
@@ -210,14 +183,12 @@ namespace morse {
     std::expected<std::string, std::string> encode(std::string_view input)
     {
         auto normalized = unicode::normalize(unicode::to_lower(input));
-
         auto text32 = unicode::to_utf32(normalized);
 
         std::vector<std::string> result;
         std::vector<std::string> errors;
 
         for (char32_t cp : text32) {
-
             auto morse = find_morse(cp);
 
             if (!morse) {
@@ -236,7 +207,6 @@ namespace morse {
 
         return utils::join(result, " ");
     }
-
 } // namespace morse
 
 int main()
@@ -264,18 +234,7 @@ int main()
     } else {
         fmt::println("{}", *result_dec);
     }
+    */
 
-    // ejemplos con una::
-    //  char to ascii code
-    char vowel = 'a';
-    auto code = static_cast<std::uint8_t>(vowel);
-    fmt::println("vowel: {} -> code: {}", vowel, code);
-
-    char32_t sp_char = U'ñ';
-    auto n_vowel = una::utf32to8(std::u32string(1, sp_char));
-    code = static_cast<std::uint32_t>(sp_char);
-    fmt::println("sp_char: {} -> code: {} -> using 'una::*'", n_vowel, code);*/
-
-    fmt::println("");
     return 0;
 } // namespace utils
