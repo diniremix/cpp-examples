@@ -1,11 +1,14 @@
 set dotenv-load := false
+
 just_home := justfile_directory()
+
 # for Windows
+
 set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
+
 # set positional-arguments
-
-
 # globals vars
+
 PROJECT_NAME := "hello_cpp"
 
 configure:
@@ -63,12 +66,26 @@ clean-d:
 clean-r:
     cmake --build --preset release --target clean
 
+[windows]
+clean:
+    Remove-Item -Verbose *.bin
+    Remove-Item -Verbose *.csv
+    Remove-Item -Verbose *_text_file.txt
+    Remove-Item -Verbose -Recurse -Force logs
+
+[unix]
 clean:
     rm -fv *.bin
     rm -fv *.csv
     rm -fv *_text_file.txt
     rm -rfv logs/
 
+[windows]
+clean-all: clean
+    # Remove-Item -Verbose -Recurse -Force build\debug\* , build\release\* , build\ninjad\*
+    @Remove-Item -Recurse -Force build\debug\* , build\release\* , build\ninjad\*
+
+[unix]
 clean-all: clean
     rm -rf build/debug/* build/release/* build/ninjad/*
 
