@@ -1,84 +1,216 @@
-#include "structs.hpp"
-
 #include <format>
 #include <iostream>
 
-struct Punto {
-    int x, y;
+// pruebas realizadas
+// | Plataforma              | fmt | std::format | std::print |
+// | ----------------------- | --- | ----------- | ---------- |
+// | Ubuntu 24.04 (GCC 13)   | X   | X (202110)  |            |
+// | Fedora 44 (GCC 16)      | X   | X (202304)  | X (202406) |
+// | Windows 11 (MSVC 19.44) | X   | X (202304)  | X (202406) |
 
-    friend std::ostream& operator<<(std::ostream& os, const Punto& p)
+
+#ifdef __cpp_lib_print
+    #include <print>
+#endif
+
+#ifdef HAS_FMT
+    #include <fmt/core.h>
+    #include <fmt/format.h>
+    #include <fmt/ostream.h>
+    #include "structs.hpp"
+#endif
+
+// ============================================================================
+// revisar el soporte de las librerías
+// ============================================================================
+
+void print_capabilities()
+{
+    std::cout << "=== Formatting Support ===\n";
+
+#ifdef HAS_FMT
+    std::cout << "FMT_VERSION       = " << FMT_VERSION << '\n';
+#else
+    std::cout << "FMT_VERSION(HAS_FMT)       = unavailable\n";
+#endif
+
+#ifdef __cpp_lib_format
+    std::cout << "__cpp_lib_format  = " << __cpp_lib_format << '\n';
+#else
+    std::cout << "__cpp_lib_format  = unavailable\n";
+#endif
+
+#ifdef __cpp_lib_print
+    std::cout << "__cpp_lib_print   = " << __cpp_lib_print << '\n';
+#else
+    std::cout << "__cpp_lib_print   = unavailable\n";
+#endif
+
+    std::cout << '\n';
+}
+
+// ============================================================================
+// Example 1: ostream
+// ============================================================================
+
+struct PuntoOstream {
+    int x;
+    int y;
+
+    friend std::ostream& operator<<(std::ostream& os, const PuntoOstream& p)
     {
         return os << "Punto(" << p.x << ", " << p.y << ")";
     }
 };
 
-// utilizar std::print
-#ifdef __cpp_lib_print
-    #include <print>
+void example_ostream()
+{
+    std::cout << "=== std::ostream ===\n";
 
-template <> struct std::formatter<Punto> {
+    PuntoOstream p{10, 20};
+
+    std::cout << p << '\n';
+    std::cout << '\n';
+}
+
+// ============================================================================
+// Example 2: fmt::streamed
+// ============================================================================
+
+#ifdef HAS_FMT
+
+void example_fmt_streamed()
+{
+    fmt::println("=== fmt::streamed ===");
+
+    PuntoOstream p{10, 20};
+
+    fmt::println("{}", fmt::streamed(p));
+    fmt::println("");
+}
+
+#endif
+
+// ============================================================================
+// Example 3: fmt::ostream_formatter
+// ============================================================================
+
+#ifdef HAS_FMT
+
+struct PuntoFmtOstream {
+    int x;
+    int y;
+
+    friend std::ostream& operator<<(std::ostream& os, const PuntoFmtOstream& p)
+    {
+        return os << "Punto(" << p.x << ", " << p.y << ")";
+    }
+};
+
+template <> struct fmt::formatter<PuntoFmtOstream> : fmt::ostream_formatter {
+};
+
+void example_fmt_ostream_formatter()
+{
+    fmt::println("=== fmt::ostream_formatter ===");
+
+    PuntoFmtOstream p{10, 20};
+
+    fmt::println("{}", p);
+    fmt::println("");
+}
+
+#endif
+
+// ============================================================================
+// Example 4: fmt::formatter
+// ============================================================================
+
+#ifdef HAS_FMT
+
+struct PuntoFmtNative {
+    int x;
+    int y;
+};
+
+template <> struct fmt::formatter<PuntoFmtNative> {
+    constexpr auto parse(fmt::format_parse_context& ctx)
+    {
+        return ctx.begin();
+    }
+
+    auto format(const PuntoFmtNative& p, fmt::format_context& ctx) const
+    {
+        return fmt::format_to(ctx.out(), "Punto({}, {})", p.x, p.y);
+    }
+};
+
+void example_fmt_formatter()
+{
+    fmt::println("=== fmt::formatter ===");
+
+    PuntoFmtNative p{10, 20};
+
+    fmt::println("{}", p);
+    fmt::println("");
+}
+
+#endif
+
+// ============================================================================
+// Example 5: std::formatter + std::print
+// ============================================================================
+
+#ifdef __cpp_lib_print
+
+struct PuntoStdPrint {
+    int x;
+    int y;
+};
+
+template <> struct std::formatter<PuntoStdPrint> {
     constexpr auto parse(std::format_parse_context& ctx)
     {
         return ctx.begin();
     }
 
-    auto format(const Punto& p, std::format_context& ctx) const
+    auto format(const PuntoStdPrint& p, std::format_context& ctx) const
     {
         return std::format_to(ctx.out(), "Punto({}, {})", p.x, p.y);
     }
 };
-#endif
 
-#ifdef FMT_VERSION
-    #include <fmt/core.h>
-    #include <fmt/ostream.h>
+void example_std_print()
+{
+    std::println("=== std::print + std::formatter ===");
 
-// usa ostream_formatter
-template <> struct fmt::formatter<Punto> : fmt::ostream_formatter {
-};
+    PuntoStdPrint p{10, 20};
 
-// formatter
-template <> struct std::formatter<Punto> {
-    constexpr auto parse(std::format_parse_context& ctx)
-    {
-        return ctx.begin(); // Ignoramos especificadores
-    }
+    std::println("{}", p);
+    std::println();
+}
 
-    auto format(const Punto& p, std::format_context& ctx) const
-    {
-        return std::format_to(ctx.out(), "Punto({}, {})", p.x, p.y);
-    }
-};
 #endif
 
 int main()
 {
+    print_capabilities();
 
-#ifdef FMT_VERSION
+    example_ostream();
+
+#ifdef HAS_FMT
+    example_fmt_streamed();
+    example_fmt_ostream_formatter();
+    example_fmt_formatter();
+    //
     Books new_book = {1, "1984", "George Orwell"};
     fmt::println("utilizando fmt::formatter (implementado en 'structs.hpp')");
     fmt::println("new_book: {}", new_book);
     fmt::println("");
-
-    Punto new_point{10, 20};
-
-    fmt::println("utilizando std::ostream");
-    std::cout << "new_point: " << new_point << std::endl;
-
-    fmt::println("");
-    fmt::println("utilizando fmt::ostream_formatter");
-    fmt::print("new_point: {}\n", new_point);
-
-    fmt::println("");
-    fmt::println("Usa fmt::streamed como wrapper");
-    fmt::print("new_point: {}\n", fmt::streamed(new_point));
 #endif
 
 #ifdef __cpp_lib_print
-    Punto new_point{10, 20};
-    std::println("");
-    std::println("Usa print");
-    std::print("new_point: {}\n", new_point);
+    example_std_print();
 #endif
 
     return 0;
