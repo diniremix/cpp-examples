@@ -1,9 +1,74 @@
+#include <chrono>
 #include <coroutine>
 #include <exception>
 #include <fmt/core.h>
-// #include <iostream>
 #include <string>
+#include <thread>
 
+/*
+ * estándar proporciona(normalmente):
+ * - co_await
+ * - co_yield
+ * - co_return
+ * - std::coroutine_handle
+ * - std::suspend_always
+ * - std::suspend_never
+ *
+ * Es decir, los bloques de construcción para
+ * construir coroutines, en cuyo caso siempre será
+ * mejor usar librerías cuando se necesite async real
+ * - Standalone Asio
+ * - cppcoro
+ * - libuv
+ * - Boost.Asio
+ */
+
+// ejemplo 1.
+//
+struct SimpleTask {
+    struct promise_type {
+        SimpleTask get_return_object()
+        {
+            return {};
+        }
+
+        std::suspend_never initial_suspend()
+        {
+            return {};
+        }
+
+        std::suspend_always final_suspend() noexcept
+        {
+            return {};
+        }
+        void return_void() {}
+        void unhandled_exception() {}
+    };
+};
+
+struct async_sleep {
+    int seconds;
+    bool await_ready()
+    {
+        return false;
+    }
+    void await_suspend(std::coroutine_handle<>)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(seconds));
+    }
+    void await_resume() {}
+};
+
+SimpleTask delayed_print()
+{
+    fmt::println("Starting delay...");
+    co_await async_sleep{2};
+    fmt::println("After 2 seconds!");
+    co_await async_sleep{1};
+    fmt::println("After 1 more second!");
+}
+
+// ejemplo 2.
 // Definimos nuestro tipo Generator
 template <typename T> struct Generator {
     struct promise_type;
@@ -149,6 +214,8 @@ Generator<int> sum_with_progress(int limit)
 int main()
 {
     try {
+        fmt::println("ejemplo usando coroutines:");
+
         auto gen = even_numbers(10);
 
         fmt::println("Primeros 5 números pares empezando desde 10:");
@@ -187,8 +254,16 @@ int main()
             fmt::print("{} ", current);
         }
 
-        // Una vez terminado, pedimos el resultado final
+        // Una vez terminada la coro, obtenemos el resultado final
         fmt::println("\nSuma total: {}", gen_sum.get_result());
+
+        fmt::println("");
+        fmt::println("antes coroutine delayed_print");
+        delayed_print();
+        fmt::println("después coroutine delayed_print");
+
+        // esperamos a que finalice
+        std::this_thread::sleep_for(std::chrono::seconds(4));
 
     } catch (const std::exception& e) {
         fmt::println(stderr, "Error: {}", e.what());
