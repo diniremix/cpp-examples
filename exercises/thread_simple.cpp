@@ -11,10 +11,12 @@ struct Task {
         {
             return {};
         }
+
         auto initial_suspend()
         {
             return std::suspend_never{};
         }
+
         auto final_suspend() noexcept
         {
             return std::suspend_always{};
