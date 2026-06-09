@@ -563,6 +563,7 @@ FodyWeavers.xsd
 build/*
 build_*/*
 vcpkg*/*
+test
 test/*
 
 # example files
