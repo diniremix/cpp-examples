@@ -12,6 +12,9 @@ template <typename T> struct Generator {
     // La estructura interna que gestiona el estado
     struct promise_type {
         T current_value;
+        // para guardar el valor de retorno
+        T final_result;
+
         std::exception_ptr exception_ptr;
 
         // Se llama al inicio de la corutina
@@ -39,8 +42,17 @@ template <typename T> struct Generator {
             return {};
         }
 
+        // aqui se debe determinar si la coroutine
+        // puede o no devolver valores
+        //
         // termina sin devolver valores
-        void return_void() {}
+        // void return_void() {}
+        //
+        // termina devolviendo valores
+        void return_value(T value)
+        {
+            final_result = std::move(value);
+        }
 
         // Si dentro de la función ocurre un error
         // el compilador captura la excepción y
@@ -69,6 +81,15 @@ template <typename T> struct Generator {
             std::rethrow_exception(handle.promise().exception_ptr);
         }
         return handle.promise().current_value;
+    }
+
+    // obtiene el resultado final
+    T get_result()
+    {
+        if (!handle.done()) {
+            throw std::runtime_error("La corutina aún no ha terminado.");
+        }
+        return handle.promise().final_result;
     }
 
     // Comprobar si la corutina ha terminado
@@ -114,6 +135,17 @@ Generator<std::string> week_days()
     co_yield "Domingo";
 }
 
+// corutina de sumatoria
+Generator<int> sum_with_progress(int limit)
+{
+    int total = 0;
+    for (int i = 1; i <= limit; ++i) {
+        total += i;
+        co_yield i; // Enviamos el número actual para mostrar progreso
+    }
+    co_return total; // Devolvemos la suma final
+}
+
 int main()
 {
     try {
@@ -144,6 +176,19 @@ int main()
         while (!day_gen.is_done()) {
             fmt::println("- {}", day_gen.next());
         }
+
+        fmt::println("");
+
+        auto gen_sum = sum_with_progress(5);
+
+        fmt::println("Procesando números...");
+        while (!gen_sum.is_done()) {
+            int current = gen_sum.next();
+            fmt::print("{} ", current);
+        }
+
+        // Una vez terminado, pedimos el resultado final
+        fmt::println("\nSuma total: {}", gen_sum.get_result());
 
     } catch (const std::exception& e) {
         fmt::println(stderr, "Error: {}", e.what());
