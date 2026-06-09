@@ -38,6 +38,7 @@ find_package(cpr CONFIG REQUIRED)
 find_package(unofficial-sqlite3 CONFIG REQUIRED)
 find_package(SQLiteCpp REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
+find_package(asio CONFIG REQUIRED)
 
 # target_include_directories(
 #    ${PROJECT_NAME}
@@ -54,6 +55,7 @@ set(COMMON_LIBS
     unofficial::sqlite3::sqlite3
     SQLiteCpp
     CLI11::CLI11
+    asio::asio
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp)

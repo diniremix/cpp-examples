@@ -6,6 +6,7 @@
   "documentation": "https://gitlab.com/homeinside/cpp-examples/",
   "license": "MIT OR Apache-2.0",
   "dependencies": [
+    "cli11",
     "cpr",
     "fmt",
     "nlohmann-json",
@@ -13,6 +14,6 @@
     "sqlite3",
     "sqlitecpp",
     "uni-algo",
-    "cli11"
+    "asio"
   ]
 }
