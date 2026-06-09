@@ -28,9 +28,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-diagnostics-show-caret")
 endif()
-#
+if(MSVC)
+    # target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+    add_compile_options(/W4 /Zc:__cplusplus /std:c++latest)
+endif()
 
-find_package(fmt CONFIG REQUIRED)
+# find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(uni-algo CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -45,6 +48,8 @@ find_package(asio CONFIG REQUIRED)
 #    PRIVATE
 #    ${CMAKE_SOURCE_DIR}/include
 #)
+#
+find_package(fmt CONFIG QUIET)
 
 set(COMMON_LIBS
     fmt::fmt
@@ -57,6 +62,11 @@ set(COMMON_LIBS
     CLI11::CLI11
     asio::asio
 )
+
+# para pruebas de fmt
+if(fmt_FOUND)
+    list(APPEND COMMON_LIBS fmt::fmt)
+endif()
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 
@@ -73,6 +83,13 @@ foreach(EXERCISE ${EXERCISES})
     get_filename_component(NAME ${EXERCISE} NAME_WE)
 
     add_executable(${NAME} ${EXERCISE})
+    if(fmt_FOUND)
+        target_compile_definitions(
+            ${NAME}
+            PRIVATE
+            HAS_FMT=1
+        )
+    endif()
 
      target_include_directories(
         ${NAME}
