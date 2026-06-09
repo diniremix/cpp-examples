@@ -1,5 +1,9 @@
 set dotenv-load := false
 just_home := justfile_directory()
+# for Windows
+set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
+# set positional-arguments
+
 
 # globals vars
 PROJECT_NAME := "hello_cpp"

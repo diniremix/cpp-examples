@@ -1,6 +1,6 @@
 # CPP exercises
 
-Simple exercises for learning [C++ 23](https://isocpp.org/).
+Simple exercises for learning modern C++ [C++ 20 and above](https://isocpp.org/).
 
 
 ## Requirements
@@ -11,6 +11,9 @@ Simple exercises for learning [C++ 23](https://isocpp.org/).
 
 ## Recommended tools
  - [just](https://github.com/casey/just) **1.47.x** and above
+ - [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
+ - [clang-tidy](https://clang.llvm.org/extra/clang-tidy/)
+ - [clangd (lsp)](https://clangd.llvm.org/)
 
 
 ## Getting Started
@@ -18,17 +21,22 @@ Simple exercises for learning [C++ 23](https://isocpp.org/).
 ### Clone the repo and make it yours:
 
 ```bash
-$ git clone git@gitlab.com:diniremix/cpp-examples.git
+$ git clone git@github.com:diniremix/cpp-examples.git
+```
+
+```bash
+$ cd cpp-examples
+```
+
+### Format
+```bash
+$ just fmt
+$ just fmt-test
 ```
 
 ### Build
-
 ```bash
-cd cpp-examples
-```
-
-```bash
-just build
+$ just build
 ```
 
 
