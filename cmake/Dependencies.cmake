@@ -1,4 +1,4 @@
-# find_package(fmt CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(uni-algo CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -8,9 +8,8 @@ find_package(SQLiteCpp REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(asio CONFIG REQUIRED)
 
-find_package(fmt CONFIG QUIET)
-
 set(COMMON_LIBS
+    fmt::fmt
     spdlog::spdlog
     uni-algo::uni-algo
     nlohmann_json::nlohmann_json
@@ -20,7 +19,3 @@ set(COMMON_LIBS
     CLI11::CLI11
     asio::asio
 )
-
-if(fmt_FOUND)
-    list(APPEND COMMON_LIBS fmt::fmt)
-endif()

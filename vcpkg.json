@@ -6,6 +6,7 @@
   "documentation": "https://gitlab.com/homeinside/cpp-examples/",
   "license": "MIT OR Apache-2.0",
   "dependencies": [
+    "asio",
     "cli11",
     "cpr",
     "fmt",
@@ -13,7 +14,6 @@
     "spdlog",
     "sqlite3",
     "sqlitecpp",
-    "uni-algo",
-    "asio"
+    "uni-algo"
   ]
 }

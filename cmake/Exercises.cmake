@@ -1,39 +1,5 @@
 include(CMakeParseArguments)
 
-function(add_exercise1 NAME)
-    add_executable(
-        ${NAME}
-        ${PROJECT_SOURCE_DIR}/exercises/${NAME}.cpp
-    )
-
-    # no todos usan include
-    target_include_directories(
-        ${NAME}
-        PRIVATE
-            ${PROJECT_SOURCE_DIR}/include
-    )
-
-    # no todos usan COMMON_LIBS
-    target_link_libraries(
-        ${NAME}
-        PRIVATE
-            project_options
-            project_warnings
-            # ${COMMON_LIBS}
-            fmt:fmt
-    )
-
-    # no todos usan HAS_FMT
-    if(fmt_FOUND)
-        target_compile_definitions(
-            ${NAME}
-            PRIVATE
-                HAS_FMT=1
-        )
-    endif()
-endfunction()
-
-
 function(add_exercise NAME)
     set(options
         USE_INCLUDE

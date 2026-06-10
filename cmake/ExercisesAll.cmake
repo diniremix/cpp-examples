@@ -1,3 +1,6 @@
+# aqui se utiliza GLOB para buscar de forma
+# automatica todos los archivos
+
 file(
     GLOB EXERCISES
     CONFIGURE_DEPENDS
@@ -31,12 +34,11 @@ foreach(EXERCISE ${EXERCISES})
             ${COMMON_LIBS}
     )
 
-    if(fmt_FOUND)
-        target_compile_definitions(
-            ${EXERCISE_NAME}
-            PRIVATE
-                HAS_FMT=1
-        )
+    target_compile_definitions(
+        ${EXERCISE_NAME}
+        PRIVATE
+            HAS_FMT=1
+    )
 
     endif()
 
