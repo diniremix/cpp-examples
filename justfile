@@ -7,65 +7,133 @@ just_home := justfile_directory()
 set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
 
 # set positional-arguments
+#
+# Project configuration
 # globals vars
 
 PROJECT_NAME := "hello_cpp"
+BUILD_DIR := "build"
 
+# ============================================================================
+# Configuration & Build
+# ============================================================================
+
+[doc("🔧 Configure debug build")]
 configure:
     cmake --preset debug
 
+[doc("🔧 Configure release build")]
 configure-r:
     cmake --fresh --preset release
 
+[doc("🔨 Build debug")]
 build:
-    # cmake --build build
-    cmake --build --preset debug
+    cmake --build --preset debug -j
 
+[doc("🔨 Build release")]
 build-r: configure-r
     cmake --build --preset release -j
 
-run-d: build
-    ./build/debug/{{ PROJECT_NAME }}
+[doc("🔄 Reconfigure and rebuild debug")]
+rebuild: clean-build configure build
 
-run-r:
-    ./build/release/{{ PROJECT_NAME }}
+# ============================================================================
+# Run Main Application
+# ============================================================================
 
-cc cmd:
-    g++ -std=c++23 src/{{ cmd }}.cpp -o build/{{ cmd }} && ./build/{{ cmd }}
+[doc("▶️  Run main app (debug)")]
+run: build
+    ./{{ BUILD_DIR }}/debug/{{ PROJECT_NAME }}
 
-config-ninja:
-    cmake --preset ninjad
+[doc("▶️  Run main app (release)")]
+run-r: build-r
+    ./{{ BUILD_DIR }}/release/{{ PROJECT_NAME }}
 
-config-test:
-    # clear && cmake --preset debug
-    cmake --preset debug
+# ============================================================================
+# Quick Compilation (Single file, no CMake)
 
-build-ninja:
-    cmake --build --preset ninjad -j
+[doc("⚡ Quick compile single file (no CMake/VCPKG)")]
+[unix]
+quick file:
+    g++ -std=c++23 -I include src/{{ file }}.cpp -o {{ BUILD_DIR }}/{{ file }}
+    ./{{ BUILD_DIR }}/{{ file }}
 
-build-test:
-    # cmake --build --preset debug --target help
-    cmake --build --preset debug -j
+[doc("⚡ Quick compile single file (no CMake/VCPKG)")]
+[windows]
+quick file:
+    cl /EHsc /std:c++latest /W4 /Zc:__cplusplus /Fe:{{ file }}.exe exercises/{{ file }}.cpp
+    .\{{ file }}.exe
 
-test pkg:
-    # clear && cmake --build --preset debug --target {{ pkg }} && ./build/debug/{{ pkg }}
-    cmake --build --preset debug --target {{ pkg }} && ./build/debug/{{ pkg }}
+# ============================================================================
+# Exercises Management
+# ============================================================================
 
-ninja pkg:
-    cmake --build --preset ninjad --target {{ pkg }} && ./build/ninjad/{{ pkg }}
+[doc("📝 List all exercises")]
+list:
+    #!/usr/bin/env bash
+    ls -1 exercises/*.cpp 2>/dev/null | sed 's|exercises/||' | sed 's|\.cpp$||' || echo "No exercises found"
 
-fmt-test:
-    clang-format -i exercises/*.cpp include/*.hpp
+[doc("🎯 Build and run specific exercise")]
+ex name: (build-ex name)
+    ./{{ BUILD_DIR }}/debug/{{ name }}
 
-clean-n:
-    cmake --build --preset ninjad --target clean
+[doc("🎯 Build specific exercise without running")]
+build-ex name:
+    cmake --build --preset debug --target {{ name }} -j
 
-clean-d:
-    cmake --build --preset debug --target clean
+[doc("🎯 Build specific exercise without running")]
+[unix]
+_new_exercise name:
+    #!/usr/bin/env bash
+    cat > "exercises/{{ name }}.cpp" <<'EOF'
+    #include <fmt/core.h>
 
-clean-r:
-    cmake --build --preset release --target clean
+    int main(){
+        fmt::println("hello world");
+        return 0;
+    }
+    EOF
 
+# llama a configure la primera vez
+new name: (_new_exercise name) configure
+
+[windows]
+_new_exercise name:
+    #!pwsh
+    @"
+    #include <fmt/core.h>
+
+    int main(){
+        fmt::println("hello world");
+        return 0;
+    }
+    "@ | Set-Content -Path (Join-Path -Path .\exercises -ChildPath "{{ name }}.cpp") -Encoding utf8
+
+# ============================================================================
+# Formatting & Linting
+# ============================================================================
+
+[doc("🎨 Format code")]
+fmt:
+    clang-format -i include/*.hpp src/*.cpp exercises/*.cpp
+
+[doc("🔍 Check formatting (CI mode)")]
+fmt-check:
+    clang-format -i include/*.hpp src/*.cpp exercises/*.cpp --Werror
+
+# ============================================================================
+# Cleanup
+# ============================================================================
+
+[doc("🧹 Clean build artifacts")]
+[unix]
+clean:
+    rm -fv *.bin
+    rm -fv *.csv
+    rm -fv *_text_file.txt
+    rm -rf logs/
+
+[doc("🧹 Clean build artifacts")]
 [windows]
 clean:
     Remove-Item -Verbose *.bin
@@ -73,32 +141,60 @@ clean:
     Remove-Item -Verbose *_text_file.txt
     Remove-Item -Verbose -Recurse -Force logs
 
-[unix]
-clean:
-    rm -fv *.bin
-    rm -fv *.csv
-    rm -fv *_text_file.txt
-    rm -rfv logs/
+[doc("💥 Clean build files)")]
+clean-build: clean
+    cmake --build --preset debug --target clean
+    cmake --build --preset release --target clean
 
+[doc("💥 Clean everything (build + generated files)")]
+[unix]
+clean-all: clean
+    rm -rf {{ BUILD_DIR }}/debug/* {{ BUILD_DIR }}/release/*
+
+[doc("💥 Clean everything (build + generated files)")]
 [windows]
 clean-all: clean
-    # Remove-Item -Verbose -Recurse -Force build\debug\* , build\release\* , build\ninjad\*
-    @Remove-Item -Recurse -Force build\debug\* , build\release\* , build\ninjad\*
+    Remove-Item -Recurse -Force {{ BUILD_DIR }}/debug/* , {{ BUILD_DIR }}/release/*
 
-[unix]
-clean-all: clean
-    rm -rf build/debug/* build/release/* build/ninjad/*
+# ============================================================================
+# Testing
+# ============================================================================
 
-fmt:
-    # clang-format -i $(shell git ls-files '*.cc' '*.h')
-    clang-format -i include/*.hpp src/*.cpp --Werror
+[doc("🧪 Run all tests")]
+test: build
+    ctest --test-dir {{ BUILD_DIR }}/debug --output-on-failure
 
-rebuild: clean-d build
+# ============================================================================
+# VCPKG Management
+# ============================================================================
 
-test-all:
-    ctest --test-dir build
+[doc("📦 Update VCPKG baseline")]
+update:
+    #!/usr/bin/env bash
+    echo "Current baseline:"
+    grep -A 1 '"baseline"' vcpkg-configuration.json
+    echo ""
+    echo "To update to latest vcpkg, run:"
+    echo " cd $VCPKG_ROOT && git pull"
+    echo "Then update baseline in vcpkg-configuration.json"
 
-[doc("🔍 Git check repo")]
+[doc("📦 Install dependencies (vcpkg-install in manifest mode)")]
+add lib:
+    vcpkg add port {{ lib }} && vcpkg install
+
+# ============================================================================
+# Git Utilities
+# ============================================================================
+
+[doc("🔍 Git repository check and cleanup")]
 [group("Git")]
 gitc:
     git fsck && git gc --prune=now --aggressive && git count-objects -vH
+
+# ============================================================================
+# Default
+# ============================================================================
+
+[doc("ℹ️  Show available commands")]
+default:
+    @just --list
