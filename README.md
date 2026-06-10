@@ -28,17 +28,35 @@ $ git clone git@github.com:diniremix/cpp-examples.git
 $ cd cpp-examples
 ```
 
+### Install dependencies
+```bash
+$ vcpkg install
+```
+
+### Configure
+```bash
+$ just configure
+# cmake --preset debug
+```
+
 ### Format
 ```bash
 $ just fmt
-$ just fmt-test
+# clang-format -i include/*.hpp src/*.cpp exercises/*.cpp
 ```
 
 ### Build
 ```bash
 $ just build
+# cmake --build --preset debug -j
 ```
 
+### Run exercise
+```bash
+$ just ex EXERCISE_NAME
+# cmake --build --preset debug --target EXERCISE_NAME -j
+# ./build/debug/EXERCISE_NAME
+```
 
 ## Tutorials
 
