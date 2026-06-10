@@ -1,43 +1,176 @@
-file(
-    GLOB EXERCISES
-    CONFIGURE_DEPENDS
-    "${PROJECT_SOURCE_DIR}/exercises/*.cpp"
-)
+include(CMakeParseArguments)
 
-foreach(EXERCISE ${EXERCISES})
-
-    get_filename_component(
-        EXERCISE_NAME
-        ${EXERCISE}
-        NAME_WE
-    )
-
+function(add_exercise1 NAME)
     add_executable(
-        ${EXERCISE_NAME}
-        ${EXERCISE}
+        ${NAME}
+        ${PROJECT_SOURCE_DIR}/exercises/${NAME}.cpp
     )
 
+    # no todos usan include
     target_include_directories(
-        ${EXERCISE_NAME}
+        ${NAME}
         PRIVATE
             ${PROJECT_SOURCE_DIR}/include
     )
 
+    # no todos usan COMMON_LIBS
     target_link_libraries(
-        ${EXERCISE_NAME}
+        ${NAME}
         PRIVATE
             project_options
             project_warnings
-            ${COMMON_LIBS}
+            # ${COMMON_LIBS}
+            fmt:fmt
     )
 
+    # no todos usan HAS_FMT
     if(fmt_FOUND)
         target_compile_definitions(
-            ${EXERCISE_NAME}
+            ${NAME}
             PRIVATE
                 HAS_FMT=1
         )
+    endif()
+endfunction()
 
+
+function(add_exercise NAME)
+    set(options
+        USE_INCLUDE
+        HAS_FMT
+    )
+
+    set(oneValueArgs)
+
+    set(multiValueArgs
+        LIBS
+    )
+
+    cmake_parse_arguments(
+        EX
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    add_executable(
+        ${NAME}
+        ${PROJECT_SOURCE_DIR}/exercises/${NAME}.cpp
+    )
+
+    target_link_libraries(
+        ${NAME}
+        PRIVATE
+            project_options
+            project_warnings
+            fmt::fmt
+    )
+
+    if(EX_USE_INCLUDE)
+        target_include_directories(
+            ${NAME}
+            PRIVATE
+                ${PROJECT_SOURCE_DIR}/include
+        )
     endif()
 
-endforeach()
+    if(EX_HAS_FMT)
+        target_compile_definitions(
+            ${NAME}
+            PRIVATE
+                HAS_FMT=1
+        )
+    endif()
+
+    if(EX_LIBS)
+        target_link_libraries(
+            ${NAME}
+            PRIVATE
+                ${EX_LIBS}
+        )
+    endif()
+
+endfunction()
+
+add_exercise(bin_files)
+add_exercise(bin_pod_files)
+add_exercise(caesar_cipher)
+add_exercise(
+    chars
+    LIBS
+      uni-algo::uni-algo
+)
+add_exercise(classes)
+add_exercise(
+    cli_app
+    LIBS
+      CLI11::CLI11
+)
+add_exercise(compiler_info)
+add_exercise(
+    coroutines_ext
+    USE_INCLUDE
+    LIBS
+        asio::asio
+)
+add_exercise(coroutines_simple)
+add_exercise(create_text_files)
+add_exercise(csv_files)
+add_exercise(factorial)
+add_exercise(fibonacci)
+add_exercise(fibonacci_rec)
+add_exercise(find_primes)
+add_exercise(fizzbuzz)
+add_exercise(
+    formatter
+    USE_INCLUDE
+    HAS_FMT
+)
+add_exercise(haversine)
+add_exercise(
+    logger
+    LIBS
+        spdlog::spdlog
+)
+add_exercise(loops)
+add_exercise(matrix_struct)
+add_exercise(
+    morse
+    LIBS
+      uni-algo::uni-algo
+)
+add_exercise(
+    open_meteo
+    LIBS
+        cpr::cpr
+        nlohmann_json::nlohmann_json
+)
+add_exercise(print)
+add_exercise(read_text_files)
+add_exercise(regex_demo)
+add_exercise(
+    rest_client
+    LIBS
+        cpr::cpr
+        unofficial::sqlite3::sqlite3
+)
+add_exercise(result_error)
+add_exercise(socket_client)
+add_exercise(socket_server)
+add_exercise(
+    sqlite_demo
+    LIBS
+        unofficial::sqlite3::sqlite3
+)
+add_exercise(
+    sqlite_orm_demo
+    LIBS
+        SQLiteCpp
+)
+add_exercise(
+    structs
+    USE_INCLUDE
+)
+add_exercise(testing)
+add_exercise(thread_simple)

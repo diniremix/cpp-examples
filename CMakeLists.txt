@@ -37,7 +37,10 @@ target_link_libraries(
     PRIVATE
         project_options
         project_warnings
-        ${COMMON_LIBS}
+        # ${COMMON_LIBS}
+        fmt::fmt
+        spdlog::spdlog
 )
 
+# include(ExercisesAll)
 include(Exercises)
