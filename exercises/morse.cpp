@@ -200,13 +200,54 @@ namespace morse {
             result.emplace_back(*morse);
         }
 
-        // fmt::println("partial converted text: '{}'", utils::join(result, " "));
-        // fmt::println("");
         if (!errors.empty()) {
             return std::unexpected(std::format("unsupported characters: {}", utils::join(errors)));
         }
 
         return utils::join(result, " ");
+    }
+
+    std::expected<std::string, std::string> decode(std::string_view input)
+    {
+        std::string text{input};
+        std::vector<std::string> result;
+        std::vector<std::string> errors;
+
+        std::ranges::replace(text, '*', '.');
+        std::ranges::replace(text, '-', '_');
+
+        text = utils::trim(text);
+
+        auto words = utils::split(text, "/");
+
+        for (const auto& word : words) {
+            auto chars = utils::split(utils::trim(word), " ");
+            if (chars.empty()) {
+                continue;
+            }
+
+            for (const auto& c : chars) {
+                auto ch = morse::get_character(c);
+
+                if (!ch) {
+                    errors.push_back(c);
+                    continue;
+                }
+
+                result.push_back(unicode::to_utf8(std::u32string{ch}));
+            }
+            result.push_back(" ");
+        }
+
+        if (!result.empty()) {
+            result.pop_back();
+        }
+
+        if (!errors.empty()) {
+            return std::unexpected(std::format("unsupported characters: {}", utils::join(errors)));
+        }
+
+        return utils::join(result, "");
     }
 
 } // namespace morse
@@ -226,7 +267,7 @@ int main()
         fmt::println("morse result: '{}'", *result_enc);
     }
 
-    /*fmt::println("");
+    fmt::println("");
 
     auto result_dec = morse::decode(*result_enc);
     if (!result_dec) {
@@ -234,7 +275,7 @@ int main()
         return 1;
     } else {
         fmt::println("decode result: '{}'", *result_dec);
-    }*/
+    }
 
     return 0;
 } // namespace utils
