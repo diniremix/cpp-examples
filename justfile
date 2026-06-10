@@ -15,6 +15,19 @@ PROJECT_NAME := "hello_cpp"
 BUILD_DIR := "build"
 
 # ============================================================================
+# Default
+# ============================================================================
+
+[doc("ℹ️  Show available commands")]
+[group("Help")]
+default: help
+
+[doc("📋 Show all recipes")]
+[group("Help")]
+help:
+    @just --list
+
+# ============================================================================
 # Configuration & Build
 # ============================================================================
 
@@ -217,16 +230,3 @@ add lib:
 [group("Git")]
 gitc:
     git fsck && git gc --prune=now --aggressive && git count-objects -vH
-
-# ============================================================================
-# Default
-# ============================================================================
-
-[doc("ℹ️  Show available commands")]
-[group("Help")]
-default: help
-
-[doc("📋 Show all recipes")]
-[group("Help")]
-help:
-    @just --list
