@@ -3,13 +3,9 @@
 #include <expected>
 #include <fmt/core.h>
 #include <format>
-#include <iostream>
-#include <regex>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <uni_algo/all.h>
-#include <unordered_map>
 #include <vector>
 
 namespace unicode {
@@ -121,7 +117,6 @@ namespace morse {
     };
 
     // Definición de la tabla Morse
-    // constexpr std::array<MorseEntry, 94> morse_table{ //68 entradas.
     constexpr auto morse_table = std::to_array<MorseEntry>({
         MorseEntry{U'a', "._"},     MorseEntry{U'á', ".__._"},   MorseEntry{U'b', "_..."},
         MorseEntry{U'c', "_._."},   MorseEntry{U'd', "_.."},     MorseEntry{U'e', "."},
