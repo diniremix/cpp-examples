@@ -94,9 +94,6 @@ _new_exercise name:
     }
     EOF
 
-# llama a configure la primera vez
-new name: (_new_exercise name) configure
-
 [windows]
 _new_exercise name:
     #!pwsh
@@ -108,6 +105,11 @@ _new_exercise name:
         return 0;
     }
     "@ | Set-Content -Path (Join-Path -Path .\exercises -ChildPath "{{ name }}.cpp") -Encoding utf8
+
+# llama a configure la primera vez
+
+# new name: (_new_exercise name) configure
+new name: (_new_exercise name)
 
 # ============================================================================
 # Formatting & Linting

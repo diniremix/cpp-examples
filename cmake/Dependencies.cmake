@@ -1,3 +1,4 @@
+# find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(uni-algo CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)

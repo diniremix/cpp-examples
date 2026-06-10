@@ -20,6 +20,7 @@ target_compile_options(
             -Wformat=2
             -fdiagnostics-color=always
             -fdiagnostics-show-option
+            # -fno-diagnostics-show-caret
             -fmessage-length=0
         >
 
@@ -38,6 +39,7 @@ target_compile_options(
             -Wdouble-promotion
             -Wformat=2
             -fcolor-diagnostics
+            # -fno-diagnostics-show-caret
         >
 
         # MSVC
