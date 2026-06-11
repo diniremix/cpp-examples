@@ -1,84 +1,100 @@
+#include <algorithm>
 #include <chrono>
-#include <coroutine>
-#include <format>
-#include <iostream>
+#include <condition_variable>
+#include <execution>
+#include <fmt/core.h>
+#include <mutex>
 #include <ranges>
 #include <thread>
+#include <vector>
+/*
+ * Un hilo es una unidad de ejecución real, gestionada
+ * por el sistema operativo.
+ *
+ * - `std::thread`
+ * hay que llamar a `join()` o `detach()`.
+ * si destruyes el objeto sin hacerlo, el programa termina.
+ * - `std::jthread`
+ * Introducido en C++20.
+ * hace `join()` automáticamente al destruirse.
+ * la mejor opción a utilizar.
+ *
+ * - Compartir datos entre hilos
+ * `std::mutex`
+ * en secciones críticas.
+ * `std::condition_variable`
+ * permite que un hilo espere una señal.
+ *
+ * - Hilos vs Procesos
+ * Hilos: comparten memoria.
+ * Procesos: cada proceso tiene su propia memoria.
+ *
+ * - `std::execution::par`
+ * indica que la implementación puede repartir el
+ * trabajo entre múltiples núcleos(similar a un pool de workers)
+ */
 
-struct Task {
-    struct promise_type {
-        Task get_return_object()
-        {
-            return {};
-        }
+std::mutex mutex;
+std::condition_variable cv;
 
-        auto initial_suspend()
-        {
-            return std::suspend_never{};
-        }
+bool ready = false;
 
-        auto final_suspend() noexcept
-        {
-            return std::suspend_always{};
-        }
-        void return_void() {}
-        void unhandled_exception() {}
-    };
-};
-
-Task my_task(int num)
+void my_task(int num, std::string name)
 {
-    std::cout << std::format("Tarea en ejecución: {}\n", num);
-    // co_await std::suspend_always{}; // Suspende la coroutine
-    co_return;
+    fmt::println("Tarea en ejecución: {}, desde '{}'", num, name);
+}
+
+void task_await()
+{
+    fmt::println("task_await: esperando");
+
+    std::unique_lock lock(mutex);
+
+    cv.wait(lock, [] { return ready; });
+
+    fmt::println("task_await: regresando");
 }
 
 int main()
 {
-    std::printf("coroutine en C++23\n");
-    // my_task(); // Llama a la coroutine
-    //
-    /*
-    //  Si deseas mantener la vida útil de la aplicación,
-    //  puedes agregar lógica adicional aquí, como esperar un tiempo.
+    fmt::println("coroutine en C++23");
+    // Llamar a las coroutines directamente
+    my_task(1, "alone"); // Ajustado: Ejecutando sin hilos
+
     for (const int& i : std::views::iota(1, 10)) {
-        // joining thread.
-        std::jthread([i] {
-            task(i);
-        });
-        //
-
-        std::thread t([i] {
-            my_task(i);
-        });
-        //
-        t.join();
-        //
-
-        // es equivalente a
-        std::thread([i] {
-            my_task(i); // Lanza la tarea en un hilo
-        }).join();// espera a que termine.
-    }
-    */
-    //
-    for (const int& i : std::views::iota(1, 10)) {
-        // Llama a la coroutine directamente
-        // my_task(i); // Ajustado: Ejecutando sin hilos
-        std::thread([counter = std::move(i)] {
-            my_task(counter); // Lanza la tarea en un hilo
-        }).detach();          // no espera
-
-        // en cuasi orden
-        std::jthread([counter = std::move(i)] {
-            my_task(counter); // Lanza la tarea en un hilo
-        });                   // automatico
-        //
-        // std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Pausa para ver la salida
+        // no espera(detach)
+        std::thread([counter = std::move(i)] { my_task(counter, "thread(detach)"); }).detach();
+        // join
+        std::thread([counter = std::move(i)] { my_task(counter, "thread(join)"); }).join();
+        // en cuasi orden, join automatico
+        std::jthread([counter = std::move(i)] { my_task(counter, "jthread"); });
     }
 
-    // Permite que la tarea se ejecute
-    std::this_thread::sleep_for(std::chrono::seconds(6));
+    // un ejemplo de un hilo esperando una señal
+    // mediante una `condition_variable`.
+    std::jthread worker(task_await);
+
+    fmt::println("main: haciendo otras cosas");
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    {
+        std::lock_guard lock(mutex);
+        ready = true;
+    }
+
+    cv.notify_one();
+
+    fmt::println("main: señal enviada");
+
+    //
+    fmt::println("terminado");
+    // Permite que la tarea finalize, si no se utiliza jthread
+    // std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    // utilizando std::execution::par
+    std::vector<int> values(1'000'000);
+    std::for_each(std::execution::par, values.begin(), values.end(), [](int& value) { value *= 2; });
 
     return 0;
 }
