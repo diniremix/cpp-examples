@@ -14,6 +14,7 @@
     "spdlog",
     "sqlite3",
     "sqlitecpp",
-    "uni-algo"
+    "uni-algo",
+    "blake3"
   ]
 }

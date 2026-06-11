@@ -140,3 +140,10 @@ add_exercise(
 )
 add_exercise(testing)
 add_exercise(thread_simple)
+add_exercise(base_x)
+add_exercise(crypt)
+add_exercise(hashing
+    LIBS
+        BLAKE3::blake3
+)
+add_exercise(rand_uuid)
