@@ -1,6 +1,51 @@
 #include <array>
 #include <blake3.h>
 #include <fmt/core.h>
+#include <sodium.h>
+#include <string>
+
+// sha256
+std::string sha256_hex(const std::string& input)
+{
+    std::array<unsigned char, crypto_hash_sha256_BYTES> digest{};
+
+    crypto_hash_sha256(digest.data(), reinterpret_cast<const unsigned char*>(input.data()), input.size());
+
+    char hex[crypto_hash_sha256_BYTES * 2 + 1];
+
+    sodium_bin2hex(hex, sizeof(hex), digest.data(), digest.size());
+
+    return std::string(hex);
+}
+
+// sha512
+std::string sha512_hex(std::string& input)
+{
+    std::array<unsigned char, crypto_hash_sha512_BYTES> digest{};
+
+    crypto_hash_sha512(digest.data(), reinterpret_cast<const unsigned char*>(input.data()), input.size());
+
+    std::array<char, crypto_hash_sha512_BYTES * 2 + 1> hex{};
+
+    sodium_bin2hex(hex.data(), hex.size(), digest.data(), digest.size());
+
+    return hex.data();
+}
+
+// hash con blake2 (recomendado)
+std::string blake2b_32(const std::string& input)
+{
+    std::array<unsigned char, crypto_generichash_BYTES_MAX> hash{};
+
+    crypto_generichash(hash.data(), hash.size(), reinterpret_cast<const unsigned char*>(input.data()), input.size(),
+                       nullptr, 0);
+
+    char hex[crypto_generichash_BYTES_MAX * 2 + 1];
+
+    sodium_bin2hex(hex, sizeof(hex), hash.data(), hash.size());
+
+    return std::string(hex);
+}
 
 // utilizando modo 'stream'
 namespace blake_stream {
@@ -120,6 +165,19 @@ int main()
     h.finalize();
 
     fmt::println("BLAKE3: {}", h.bytes_to_hex());
+
+    fmt::println("");
+
+    auto result = sha256_hex(data);
+    fmt::println("sha256 (sodium): {}", result);
+    fmt::println("");
+
+    result = sha512_hex(data);
+    fmt::println("sha512 (sodium): {}", result);
+    fmt::println("");
+
+    result = blake2b_32(data);
+    fmt::println("hashing with blake2 (sodium): {}", result);
 
     return 0;
 }
