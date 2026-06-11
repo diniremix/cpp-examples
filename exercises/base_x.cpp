@@ -51,6 +51,25 @@ std::string from_base64(std::string_view encoded, bool url_safe = false)
     return output;
 }
 
+// genera un base64 desde N de bytes
+std::string generate_token(std::size_t bytes = 32)
+{
+    std::string buffer(bytes, '\0');
+
+    randombytes_buf(buffer.data(), bytes);
+
+    const std::size_t encoded_size = sodium_base64_encoded_len(bytes, sodium_base64_VARIANT_URLSAFE_NO_PADDING);
+
+    std::string encoded(encoded_size, '\0');
+
+    sodium_bin2base64(encoded.data(), encoded.size(), reinterpret_cast<const unsigned char*>(buffer.data()),
+                      buffer.size(), sodium_base64_VARIANT_URLSAFE_NO_PADDING);
+
+    encoded.resize(std::strlen(encoded.c_str()));
+
+    return encoded;
+}
+
 int main()
 {
     if (sodium_init() < 0) {
@@ -97,5 +116,14 @@ int main()
     fmt::println("from_base64: '{}'", result);
 
     assert(data == result);
+
+    fmt::println("");
+
+    fmt::println("tokens");
+    result = generate_token();
+    fmt::println("token(32 bytes):'{}'", result);
+    result = generate_token(64);
+    fmt::println("token(64 bytes):'{}'", result);
+
     return 0;
 }
