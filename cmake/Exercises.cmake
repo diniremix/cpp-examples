@@ -140,7 +140,10 @@ add_exercise(
 )
 add_exercise(testing)
 add_exercise(thread_simple)
-add_exercise(base_x)
+add_exercise(base_x
+    LIBS
+      unofficial-sodium::sodium
+)
 add_exercise(crypt)
 add_exercise(hashing
     LIBS
