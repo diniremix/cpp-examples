@@ -32,7 +32,7 @@ std::string sha512_hex(std::string& input)
     return hex.data();
 }
 
-// hash con blake2 (recomendado)
+// hash con Blake2 (recomendado)
 std::string blake2b_32(const std::string& input)
 {
     std::array<unsigned char, crypto_generichash_BYTES_MAX> hash{};
@@ -47,7 +47,7 @@ std::string blake2b_32(const std::string& input)
     return std::string(hex);
 }
 
-// utilizando modo 'stream'
+// Blake3 utilizando modo 'stream'
 namespace blake_stream {
     struct Stream {
         blake3_hasher hasher;
@@ -88,7 +88,7 @@ namespace blake_stream {
     };
 } // namespace blake_stream
 
-// utilizando modo 'normal'
+// Blake3 utilizando modo 'normal'
 namespace blake {
     std::string bytes_to_hex(const std::array<std::uint8_t, 32>& bytes)
     {

@@ -99,7 +99,7 @@ list:
 
 [doc("🎯 Build and run specific exercise")]
 [group("Development")]
-ex name: (build-ex name)
+ex name: fmt (build-ex name)
     ./{{ BUILD_DIR }}/debug/{{ name }}
 
 [doc("🎯 Build specific exercise without running")]
