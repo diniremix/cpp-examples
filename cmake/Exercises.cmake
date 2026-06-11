@@ -145,5 +145,6 @@ add_exercise(crypt)
 add_exercise(hashing
     LIBS
         BLAKE3::blake3
+        unofficial-sodium::sodium
 )
 add_exercise(rand_uuid)
