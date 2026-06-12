@@ -144,7 +144,11 @@ add_exercise(base_x
     LIBS
       unofficial-sodium::sodium
 )
-add_exercise(crypt)
+add_exercise(crypt
+    LIBS
+        unofficial-sodium::sodium
+)
+
 add_exercise(hashing
     LIBS
         BLAKE3::blake3
