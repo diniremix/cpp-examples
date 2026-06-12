@@ -5,7 +5,8 @@
 #include <vector>
 
 /*
- * Los concepts permiten restringir templates.
+ * Los concepts permiten restringir templates, ofreciendo
+ * restricciones de tipos, de forma explícita.
  * un 'concept' es básicamente una regla y al
  * aplicarla aclara que 'X función' solo acepta
  * tipos que cumplen la regla.
@@ -135,9 +136,18 @@ int main()
     print_f("");                              // usando nuestra funcion
     print_f("usuarios activos, adultos (2)"); // usando nuestra funcion
 
-    // 3. igual que `2` solo que reutilizando las funciones de negocio
-    // mejorando la intención del resultado a obtener.
+    // 3. igual que `2` solo que reutilizando las funciones de negocio,
+    // mejorando la intención del resultado a obtener y haciendo el pipeline
+    // mucho más legible, ahora la 'vista' ya no conoce la lógica de negocio.
     auto active_adult = users | std::views::filter(is_active_adult) | std::views::transform(&User::username);
+    /*
+     donde `std::views::transform(&User::username);` equivale a
+     ```
+        [](const User& user) {
+            return user.username;
+        }
+    ```
+    */
 
     for (const auto& name : active_adult) {
         fmt::println("{}", name);

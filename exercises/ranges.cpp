@@ -6,8 +6,38 @@
 
 /*
  * ranges son para describir cómo recorrer y
- * transformar datos, no para almacenar datos.
- * recuerda que las 'views/vistas' no poseen los datos.
+ * transformar datos, no para almacenarlos.
+ * recuerda que las 'views/vistas' no poseen los datos
+ *
+ * - Un rango (range) es algo que puede recorrerse
+ *
+ * - Una vista (view) NO almacena datos.
+ * Solo describe cómo acceder o transformar eso datos
+ *
+ * - Las views suelen ser `lazy`:
+ * el trabajo se realiza cuando alguien consume la vista
+ *
+ * - Las views normalmente dependen del rango original.
+ * Si el rango deja de existir, la vista puede quedar
+ * inválida (comportamiento indefinido)
+ *
+ * en resumen:
+ * Una view es más parecida a una consulta SQL
+ * `SELECT ... WHERE ...`
+ * que a un `std::vector`
+ * ya que describe cómo obtener resultados,
+ * pero normalmente no contiene resultados
+ *
+ * - Cuando se necesita un resultado independiente,
+ * la vista debe materializarse en un contenedor
+ * (por ejemplo std::vector).
+ *
+ * std::vector -> posee datos
+ * std::views -> observa datos
+ *
+ * Los ranges no reemplazan a los contenedores.
+ * trabajan sobre ellos.
+ *
  */
 
 /* sin ranges:
@@ -111,6 +141,8 @@ int main()
 
     fmt::print("Nombres largos en mayúsculas: ");
 
+    // esto funciona ya que el rango original (el vector `nombres`)
+    // existe en `main()`.
     auto result_names = procesar_nombres(nombres);
 
     for (const auto& nombre : result_names) {
@@ -121,7 +153,12 @@ int main()
 
     fmt::print("Primeros 5 cuadrados: ");
 
-    // Generar secuencias infinitas (lazy!)
+    /*
+     * Generar secuencias infinitas (lazy!)
+     * aqui usamos `iota` que puede generar secuencias infinitas
+     * asi que conviene limitar el recorrido con vistas como: `take(N)`
+     * o consumir solo una cantidad finita de elementos.
+     */
     auto cuadrados_infinitos = std::views::iota(1) // 1, 2, 3, 4...
                                | std::views::transform([](int n) { return n * n; });
 
