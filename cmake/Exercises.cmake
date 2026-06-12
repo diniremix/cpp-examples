@@ -150,4 +150,7 @@ add_exercise(hashing
         BLAKE3::blake3
         unofficial-sodium::sodium
 )
-add_exercise(rand_uuid)
+add_exercise(rand_uuid
+    LIBS
+        unofficial-sodium::sodium
+)
