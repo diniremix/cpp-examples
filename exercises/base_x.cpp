@@ -1,7 +1,81 @@
 #include <cassert>
+#include <cstddef>
 #include <fmt/core.h>
 #include <sodium.h>
 #include <string>
+#include <string_view>
+
+/*
+ * se utilizan funciones internas de libsodium
+ * para el uso de base64, si se desea usar
+ * otros encoding, se recomienda utilizar
+ * librerías especificas
+ * - cppcodec
+ * - Boost
+ */
+
+static constexpr char BASE32_ALPHABET[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+std::string to_base32(std::string_view input)
+{
+    const unsigned char* data = reinterpret_cast<const unsigned char*>(input.data());
+
+    std::string output;
+
+    int buffer = 0;
+    int bits_left = 0;
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        buffer = (buffer << 8) | data[i];
+        bits_left += 8;
+
+        while (bits_left >= 5) {
+            int index = (buffer >> (bits_left - 5)) & 0x1F;
+            output.push_back(BASE32_ALPHABET[index]);
+            bits_left -= 5;
+        }
+    }
+
+    if (bits_left > 0) {
+        int index = (buffer << (5 - bits_left)) & 0x1F;
+        output.push_back(BASE32_ALPHABET[index]);
+    }
+
+    return output;
+}
+
+int base32_value(char c)
+{
+    if (c >= 'A' && c <= 'Z')
+        return c - 'A';
+    if (c >= '2' && c <= '7')
+        return c - '2' + 26;
+    return -1;
+}
+
+std::string from_base32(std::string_view input)
+{
+    std::string output;
+
+    int buffer = 0;
+    int bits_left = 0;
+
+    for (char c : input) {
+        int value = base32_value(c);
+        if (value < 0)
+            continue; // ignora padding o basura
+
+        buffer = (buffer << 5) | value;
+        bits_left += 5;
+
+        if (bits_left >= 8) {
+            output.push_back(static_cast<char>((buffer >> (bits_left - 8)) & 0xFF));
+            bits_left -= 8;
+        }
+    }
+
+    return output;
+}
 
 std::string to_base64(std::string_view input, bool url_safe = false)
 {
@@ -75,12 +149,21 @@ int main()
     if (sodium_init() < 0) {
         return 1;
     }
+
     fmt::println("BaseXX examples");
 
     std::string data = "El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña ¡tocaba el saxofón detrás "
                        "del palenque de paja!.";
 
-    auto encoded = to_base64(data, false);
+    // base32
+    auto encoded = to_base32(data);
+    fmt::println("base32: '{}'", encoded);
+    auto decoded = from_base32(encoded);
+    fmt::println("from_base32: '{}'", decoded);
+    fmt::println("size: {}", encoded.size());
+
+    // base64
+    encoded = to_base64(data, false);
     fmt::println("base64: '{}'", encoded);
     auto result = from_base64(encoded, false);
     fmt::println("from_base64: '{}'", result);
