@@ -13,6 +13,18 @@ constexpr auto green = "\033[32m";
 constexpr auto yellow = "\033[33m";
 constexpr auto blue = "\033[34m";
 constexpr auto cyan = "\033[36m";
+#include <fmt/core.h>
+#include <string_view>
+
+void move_cursor_to(int row, int col)
+{
+    fmt::print("\033[{};{}H", row, col);
+}
+
+void cls()
+{
+    fmt::print("\033[2J\033[H");
+}
 
 int to_int(std::string_view sv)
 {
@@ -97,6 +109,12 @@ int main()
     line = read_line("ready?: [y|Y|yes|true] ");
     bool resp = parse_bool(line);
     fmt::println("response: {}", resp);
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    move_cursor_to(1, 10);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    cls();
 
     return 0;
 }
