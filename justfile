@@ -102,10 +102,15 @@ list:
 ex name: fmt (build-ex name)
     ./{{ BUILD_DIR }}/debug/{{ name }}
 
-[doc("🎯 Build specific exercise without running")]
+[doc("🎯 Build specific exercise without running (debug)")]
 [group("Build")]
 build-ex name:
     cmake --build --preset debug --target {{ name }} -j
+
+[doc("🎯 Build specific exercise without running (release)")]
+[group("Build")]
+rel-ex name:
+    cmake --build --preset release --target {{ name }} -j
 
 [doc("🎯 Build specific exercise without running")]
 [group("Development")]
