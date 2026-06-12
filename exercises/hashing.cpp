@@ -123,6 +123,10 @@ namespace blake {
 
 int main()
 {
+    if (sodium_init() < 0) {
+        return 1;
+    }
+
     fmt::println("hashing examples");
 
     std::string data = "The quick brown fox jumps over the lazy dog";
