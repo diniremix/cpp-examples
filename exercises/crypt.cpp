@@ -32,7 +32,7 @@
  * CPU muy lento (cientos de ms a segundos)
  *
  * para este ejemplo se utiliza INTERACTIVE con los
- * siguientes ajustes
+ * siguientes ajustes:
  * ```
  * const unsigned long long opslimit = crypto_pwhash_OPSLIMIT_INTERACTIVE;
  * const size_t memlimit = 16 * 1024 * 1024; // 16 MB
@@ -45,6 +45,7 @@ struct ParsedHash {
     std::vector<unsigned char> salt;
     std::vector<unsigned char> hash;
 };
+
 ParsedHash parse_hash(const std::string& input)
 {
     ParsedHash ph;
@@ -79,6 +80,7 @@ ParsedHash parse_hash(const std::string& input)
 
     return ph;
 }
+
 bool verify_password(const std::string& password, const ParsedHash& ph)
 {
     std::vector<unsigned char> computed(ph.hash.size());
@@ -127,6 +129,7 @@ std::string hash_password(const std::string& password)
 
     return oss.str();
 }
+
 int main()
 {
     if (sodium_init() < 0)
@@ -138,7 +141,7 @@ int main()
     std::string stored = hash_password(password);
 
     // guardar en DB
-    std::cout << "Stored: " << stored << "\n";
+    fmt::println("Stored: {}", stored);
 
     // LOGIN
     ParsedHash ph = parse_hash(stored);
@@ -146,7 +149,7 @@ int main()
     bool ok = verify_password("mi_password_segura", ph);
 
     if (ok)
-        std::cout << "LOGIN OK\n";
+        fmt::println("LOGIN OK");
     else
-        std::cout << "LOGIN FAIL\n";
+        fmt::println("LOGIN FAIL");
 }
