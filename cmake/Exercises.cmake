@@ -161,3 +161,4 @@ add_exercise(rand_uuid
 add_exercise(terminal)
 add_exercise(ranges)
 add_exercise(concepts)
+add_exercise(namespaces USE_INCLUDE)
