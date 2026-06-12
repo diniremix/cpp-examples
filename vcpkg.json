@@ -1,9 +1,9 @@
 {
   "name": "hello-cpp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A C++23 examples",
-  "homepage": "https://gitlab.com/homeinside/cpp-examples",
-  "documentation": "https://gitlab.com/homeinside/cpp-examples/",
+  "homepage": "https://github.com/diniremix/cpp-examples",
+  "documentation": "https://github.com/diniremix/cpp-examples/",
   "license": "MIT OR Apache-2.0",
   "dependencies": [
     "asio",
