@@ -158,3 +158,6 @@ add_exercise(rand_uuid
     LIBS
         unofficial-sodium::sodium
 )
+add_exercise(terminal)
+add_exercise(ranges)
+add_exercise(concepts)
