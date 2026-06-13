@@ -14,20 +14,47 @@ option(
     OFF
 )
 
-if(ENABLE_SANITIZERS)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-        target_compile_options(
-            project_options
-            INTERFACE
-                -fsanitize=address
-                -fsanitize=undefined
-        )
+option(
+    WARNINGS_AS_ERRORS
+    "Treat warnings as errors"
+    OFF
+)
 
-        target_link_options(
-            project_options
-            INTERFACE
+# Sanitizers solamente en Debug
+if(ENABLE_SANITIZERS)
+    target_compile_options(
+        project_options
+        INTERFACE
+
+            $<$<AND:
+                $<CONFIG:Debug>,
+                $<CXX_COMPILER_ID:GNU,Clang>
+            >:
                 -fsanitize=address
                 -fsanitize=undefined
-        )
-    endif()
+                -fno-omit-frame-pointer
+                -fno-optimize-sibling-calls
+            >
+
+            # Protección adicional para Release
+            $<$<AND:
+                $<NOT:$<CONFIG:Debug>>,
+                $<CXX_COMPILER_ID:GNU,Clang>
+            >:
+                -fstack-protector-strong
+            >
+    )
+
+    target_link_options(
+        project_options
+        INTERFACE
+
+            $<$<AND:
+                $<CONFIG:Debug>,
+                $<CXX_COMPILER_ID:GNU,Clang>
+            >:
+                -fsanitize=address
+                -fsanitize=undefined
+            >
+    )
 endif()

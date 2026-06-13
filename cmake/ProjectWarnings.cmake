@@ -12,11 +12,14 @@ target_compile_options(
             -Wshadow
             -Wconversion
             -Wsign-conversion
+            -Wcast-qual
             -Wold-style-cast
             -Wnon-virtual-dtor
             -Woverloaded-virtual
             -Wnull-dereference
             -Wdouble-promotion
+            -Wimplicit-fallthrough
+            -Wundef
             -Wformat=2
             -fdiagnostics-color=always
             -fdiagnostics-show-option
@@ -32,11 +35,14 @@ target_compile_options(
             -Wshadow
             -Wconversion
             -Wsign-conversion
+            -Wcast-qual
             -Wold-style-cast
             -Wnon-virtual-dtor
             -Woverloaded-virtual
             -Wnull-dereference
             -Wdouble-promotion
+            -Wimplicit-fallthrough
+            -Wundef
             -Wformat=2
             -fcolor-diagnostics
             # -fno-diagnostics-show-caret
@@ -44,8 +50,17 @@ target_compile_options(
 
         # MSVC
         $<$<CXX_COMPILER_ID:MSVC>:
-            /std:c++latest
+            # /std:c++latest
             /Zc:__cplusplus
             /W4
         >
 )
+
+if(WARNINGS_AS_ERRORS)
+    target_compile_options(
+        project_warnings
+        INTERFACE
+            $<$<CXX_COMPILER_ID:GNU,Clang>:-Werror>
+            $<$<CXX_COMPILER_ID:MSVC>:/WX>
+    )
+endif()
