@@ -140,3 +140,25 @@ add_exercise(
 )
 add_exercise(testing)
 add_exercise(thread_simple)
+add_exercise(base_x
+    LIBS
+      unofficial-sodium::sodium
+)
+add_exercise(crypt
+    LIBS
+        unofficial-sodium::sodium
+)
+
+add_exercise(hashing
+    LIBS
+        BLAKE3::blake3
+        unofficial-sodium::sodium
+)
+add_exercise(rand_uuid
+    LIBS
+        unofficial-sodium::sodium
+)
+add_exercise(terminal)
+add_exercise(ranges)
+add_exercise(concepts)
+add_exercise(namespaces USE_INCLUDE)

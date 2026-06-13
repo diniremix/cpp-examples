@@ -7,6 +7,9 @@ find_package(unofficial-sqlite3 CONFIG REQUIRED)
 find_package(SQLiteCpp REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(asio CONFIG REQUIRED)
+find_package(blake3 CONFIG REQUIRED)
+find_package(unofficial-sodium CONFIG REQUIRED)
+
 
 set(COMMON_LIBS
     fmt::fmt
@@ -18,4 +21,6 @@ set(COMMON_LIBS
     SQLiteCpp
     CLI11::CLI11
     asio::asio
+    blake3::blake3
+    unofficial-sodium::sodium
 )

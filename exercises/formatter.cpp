@@ -8,16 +8,16 @@
 // | Fedora 44 (GCC 16)      | X   | X (202304)  | X (202406) |
 // | Windows 11 (MSVC 19.44) | X   | X (202304)  | X (202406) |
 
-
 #ifdef __cpp_lib_print
     #include <print>
 #endif
 
 #ifdef HAS_FMT
+    #include "structs.hpp"
+
     #include <fmt/core.h>
     #include <fmt/format.h>
     #include <fmt/ostream.h>
-    #include "structs.hpp"
 #endif
 
 // ============================================================================

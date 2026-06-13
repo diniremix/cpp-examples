@@ -3,13 +3,9 @@
 #include <expected>
 #include <fmt/core.h>
 #include <format>
-#include <iostream>
-#include <regex>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <uni_algo/all.h>
-#include <unordered_map>
 #include <vector>
 
 namespace unicode {
@@ -121,19 +117,19 @@ namespace morse {
     };
 
     // Definición de la tabla Morse
-    constexpr std::array<MorseEntry, 94> morse_table{
-        MorseEntry{U'a', "._"},     MorseEntry{U'á', "..__._"},  MorseEntry{U'b', "_..."},
+    constexpr auto morse_table = std::to_array<MorseEntry>({
+        MorseEntry{U'a', "._"},     MorseEntry{U'á', ".__._"},   MorseEntry{U'b', "_..."},
         MorseEntry{U'c', "_._."},   MorseEntry{U'd', "_.."},     MorseEntry{U'e', "."},
         MorseEntry{U'é', ".._.."},  MorseEntry{U'f', ".._."},    MorseEntry{U'g', "__."},
         MorseEntry{U'h', "...."},   MorseEntry{U'i', ".."},      MorseEntry{U'í', ".."},
         MorseEntry{U'j', ".___"},   MorseEntry{U'k', "_._"},     MorseEntry{U'l', "._.."},
-        MorseEntry{U'm', "__"},     MorseEntry{U'n', "_."},      MorseEntry{U'ñ', ".__.__"},
-        MorseEntry{U'o', "___"},    MorseEntry{U'ó', "__._."},   MorseEntry{U'p', ".__."},
+        MorseEntry{U'm', "__"},     MorseEntry{U'n', "_."},      MorseEntry{U'ñ', "__.__"},
+        MorseEntry{U'o', "___"},    MorseEntry{U'ó', "___."},    MorseEntry{U'p', ".__."},
         MorseEntry{U'q', "__._"},   MorseEntry{U'r', "._."},     MorseEntry{U's', "..."},
         MorseEntry{U't', "_"},      MorseEntry{U'u', ".._"},     MorseEntry{U'ú', ".._"},
         MorseEntry{U'v', "..._"},   MorseEntry{U'w', ".__"},     MorseEntry{U'x', "_.._"},
         MorseEntry{U'y', "_.__"},   MorseEntry{U'z', "__.."},    MorseEntry{U'æ', "._._"},
-        MorseEntry{U'ø', "__._."},  MorseEntry{U'å', ".__._"},   MorseEntry{U'ü', "..__"},
+        MorseEntry{U'ø', "___."},   MorseEntry{U'å', ".__._"},   MorseEntry{U'ü', "..__"},
         MorseEntry{U'0', "_____"},  MorseEntry{U'1', ".____"},   MorseEntry{U'2', "..___"},
         MorseEntry{U'3', "...__"},  MorseEntry{U'4', "...._"},   MorseEntry{U'5', "....."},
         MorseEntry{U'6', "_...."},  MorseEntry{U'7', "__..."},   MorseEntry{U'8', "___.."},
@@ -145,7 +141,7 @@ namespace morse {
         MorseEntry{U'+', "._._."},  MorseEntry{U'-', "_...._"},  MorseEntry{U'_', "..__._"},
         MorseEntry{U'"', "._.._."}, MorseEntry{U'$', "..._.._"}, MorseEntry{U'@', ".__._."},
         MorseEntry{U' ', "/"},
-    };
+    });
 
     std::string_view get_morse(char32_t ch)
     {
@@ -199,14 +195,56 @@ namespace morse {
             result.emplace_back(*morse);
         }
 
-        fmt::println("partial converted text: '{}'", utils::join(result, " "));
-        fmt::println("");
         if (!errors.empty()) {
             return std::unexpected(std::format("unsupported characters: {}", utils::join(errors)));
         }
 
         return utils::join(result, " ");
     }
+
+    std::expected<std::string, std::string> decode(std::string_view input)
+    {
+        std::string text{input};
+        std::vector<std::string> result;
+        std::vector<std::string> errors;
+
+        std::ranges::replace(text, '*', '.');
+        std::ranges::replace(text, '-', '_');
+
+        text = utils::trim(text);
+
+        auto words = utils::split(text, "/");
+
+        for (const auto& word : words) {
+            auto chars = utils::split(utils::trim(word), " ");
+            if (chars.empty()) {
+                continue;
+            }
+
+            for (const auto& c : chars) {
+                auto ch = morse::get_character(c);
+
+                if (!ch) {
+                    errors.push_back(c);
+                    continue;
+                }
+
+                result.push_back(unicode::to_utf8(std::u32string{ch}));
+            }
+            result.push_back(" ");
+        }
+
+        if (!result.empty()) {
+            result.pop_back();
+        }
+
+        if (!errors.empty()) {
+            return std::unexpected(std::format("unsupported characters: {}", utils::join(errors)));
+        }
+
+        return utils::join(result, "");
+    }
+
 } // namespace morse
 
 int main()
@@ -216,25 +254,23 @@ int main()
                        "del palenque de paja!.";
     fmt::println("normal text: '{}'", text);
 
-    /*auto result_enc = morse::encode(text);
+    auto result_enc = morse::encode(text);
     if (!result_enc) {
         fmt::println(stderr, "encode error: {}", result_enc.error());
         return 1;
     } else {
         fmt::println("morse result: '{}'", *result_enc);
-    }*/
-    fmt::println("'ñ' -> {}", morse::encode("ñ").value());
-    fmt::println("'ó' -> {}", morse::encode("ó").value());
-    fmt::println("'á' -> {}", morse::encode("á").value());
+    }
 
-    /*
-    auto result_dec = decode(*result_enc);
+    fmt::println("");
+
+    auto result_dec = morse::decode(*result_enc);
     if (!result_dec) {
         fmt::println(stderr, "decode error: {}", result_dec.error());
+        return 1;
     } else {
-        fmt::println("{}", *result_dec);
+        fmt::println("decode result: '{}'", *result_dec);
     }
-    */
 
     return 0;
 } // namespace utils

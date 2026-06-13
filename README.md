@@ -8,6 +8,7 @@ Simple exercises for learning modern C++ [C++ 20 and above](https://isocpp.org/)
  - [GCC](https://gcc.gnu.org/) **13.3.x** and above
  - [vcpkg](https://vcpkg.io/en/) **2026-05-27** and above
  - [Cmake](https://cmake.org/download/) **3.28.x** and above
+ - [Ninja](https://ninja-build.org/) **1.11.x** and above
 
 ## Recommended tools
  - [just](https://github.com/casey/just) **1.47.x** and above
@@ -39,12 +40,6 @@ $ just configure
 # cmake --preset debug
 ```
 
-### Format
-```bash
-$ just fmt
-# clang-format -i include/*.hpp src/*.cpp exercises/*.cpp
-```
-
 ### Build
 ```bash
 $ just build
@@ -58,9 +53,23 @@ $ just ex EXERCISE_NAME
 # ./build/debug/EXERCISE_NAME
 ```
 
+
 ## Tutorials
 
- - We are working on it... :smile:
+create a new example:
+ ```bash
+ $ just new EXERCISE_NAME
+ ```
+ 
+ Then add the following line to `cmake/Exercises.cmake`:
+  ```cmake
+ add_exercise(EXERCISE_NAME)
+ ```
+ 
+ Finally, run:
+  ```bash
+ $ just ex EXERCISE_NAME
+ ```
 
 
 ## License
