@@ -22,37 +22,25 @@ option(
 
 # Sanitizers solamente en Debug
 if(ENABLE_SANITIZERS)
-    target_compile_options(
+  target_compile_options(
         project_options
         INTERFACE
-
-            $<$<AND:
-                $<CONFIG:Debug>,
-                $<CXX_COMPILER_ID:GNU,Clang>
-            >:
+            $<$<AND:$<CONFIG:Debug>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
                 -fsanitize=address
                 -fsanitize=undefined
                 -fno-omit-frame-pointer
                 -fno-optimize-sibling-calls
             >
 
-            # Protección adicional para Release
-            $<$<AND:
-                $<NOT:$<CONFIG:Debug>>,
-                $<CXX_COMPILER_ID:GNU,Clang>
-            >:
+            $<$<AND:$<NOT:$<CONFIG:Debug>>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
                 -fstack-protector-strong
             >
     )
 
-    target_link_options(
+  target_link_options(
         project_options
         INTERFACE
-
-            $<$<AND:
-                $<CONFIG:Debug>,
-                $<CXX_COMPILER_ID:GNU,Clang>
-            >:
+            $<$<AND:$<NOT:$<CONFIG:Debug>>,$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
                 -fsanitize=address
                 -fsanitize=undefined
             >

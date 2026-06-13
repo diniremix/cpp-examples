@@ -57,10 +57,12 @@ target_compile_options(
 )
 
 if(WARNINGS_AS_ERRORS)
-    target_compile_options(
+  target_compile_options(
         project_warnings
         INTERFACE
-            $<$<CXX_COMPILER_ID:GNU,Clang>:-Werror>
+            $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>>:
+            -Werror
+            >
             $<$<CXX_COMPILER_ID:MSVC>:/WX>
     )
 endif()

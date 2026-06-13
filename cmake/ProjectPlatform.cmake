@@ -1,6 +1,5 @@
 add_library(project_platform INTERFACE)
 
-# Windows
 # 0x0601 cubre Windows 7
 # 0x0A00 cubre Windows 10 y Windows 11
 target_compile_definitions(project_platform INTERFACE

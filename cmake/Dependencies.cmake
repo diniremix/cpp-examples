@@ -10,7 +10,6 @@ find_package(asio CONFIG REQUIRED)
 find_package(blake3 CONFIG REQUIRED)
 find_package(unofficial-sodium CONFIG REQUIRED)
 
-
 set(COMMON_LIBS
     fmt::fmt
     spdlog::spdlog
