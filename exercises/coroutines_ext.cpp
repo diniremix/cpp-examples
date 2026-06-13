@@ -4,13 +4,11 @@
 #include <fmt/core.h>
 #include <ranges>
 
-#if defined(_MSC_VER)
-    #ifdef __cpp_lib_generator
-        #include <generator>
-    #else
-        // fallback
-        #include "generator.hpp"
-    #endif
+#ifdef __cpp_lib_generator
+    #include <generator>
+#else
+    // fallback
+    #include "generator.hpp"
 #endif
 
 asio::awaitable<void> toggle_switch(std::string name, int times, asio::steady_timer& timer)
