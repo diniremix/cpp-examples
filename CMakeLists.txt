@@ -19,6 +19,7 @@ list(APPEND CMAKE_MODULE_PATH
 
 include(ProjectOptions)
 include(ProjectWarnings)
+include(ProjectPlatform)
 include(Dependencies)
 
 add_executable(
@@ -37,6 +38,7 @@ target_link_libraries(
     PRIVATE
         project_options
         project_warnings
+        project_platform
         # ${COMMON_LIBS}
         fmt::fmt
         spdlog::spdlog

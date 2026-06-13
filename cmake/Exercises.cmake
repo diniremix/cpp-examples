@@ -30,6 +30,7 @@ function(add_exercise NAME)
         PRIVATE
             project_options
             project_warnings
+            project_platform
             fmt::fmt
     )
 
