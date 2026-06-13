@@ -4,6 +4,7 @@
 #include <fmt/core.h>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <vector>
 
@@ -13,8 +14,6 @@ constexpr auto green = "\033[32m";
 constexpr auto yellow = "\033[33m";
 constexpr auto blue = "\033[34m";
 constexpr auto cyan = "\033[36m";
-#include <fmt/core.h>
-#include <string_view>
 
 void move_cursor_to(int row, int col)
 {
@@ -26,13 +25,16 @@ void cls()
     fmt::print("\033[2J\033[H");
 }
 
-int to_int(std::string_view sv)
+int to_int(const std::string& s)
 {
     int value{};
 
-    auto [ptr, ec] = std::from_chars(sv.data(), sv.data() + sv.size(), value);
+    auto first = s.data();
+    auto last = first + s.size();
 
-    if (ec != std::errc{} || ptr != sv.end()) {
+    auto [ptr, ec] = std::from_chars(first, last, value);
+
+    if (ec != std::errc{}) {
         throw std::runtime_error("invalid integer");
     }
 
