@@ -2,12 +2,15 @@
 #include <asio/steady_timer.hpp>
 #include <chrono>
 #include <fmt/core.h>
+#include <ranges>
 
-#ifdef __cpp_lib_generator
-    #include <generator>
-#else
-    // fallback
-    #include "generator.hpp"
+#if defined(_MSC_VER)
+    #ifdef __cpp_lib_generator
+        #include <generator>
+    #else
+        // fallback
+        #include "generator.hpp"
+    #endif
 #endif
 
 asio::awaitable<void> toggle_switch(std::string name, int times, asio::steady_timer& timer)
@@ -68,9 +71,7 @@ asio::awaitable<void> run()
     fmt::println("Finalizado");
 }
 
-//
 // usando generadores (`std::generator`)
-//
 
 // Nuestra corutina generadora
 std::generator<int> even_numbers(int start)
