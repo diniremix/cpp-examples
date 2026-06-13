@@ -7,7 +7,6 @@
 #include <string_view>
 #include <uni_algo/all.h>
 #include <vector>
-
 namespace unicode {
     std::string to_lower(std::string_view text)
     {
@@ -21,14 +20,17 @@ namespace unicode {
 
     std::string normalize(std::string_view text)
     {
+        /*
+        auto wide = una::utf8to32(text);
+        std::u32string result(wide.begin(), wide.end());
+        return result;
+        */
         return una::norm::to_nfc_utf8(text);
     }
 
     std::u32string to_utf32(std::string_view text)
     {
-        auto wide = una::utf8to32(text);
-        std::u32string result(wide.begin(), wide.end());
-        return result;
+        return una::utf8to32<char, char32_t>(text);
     }
 
     std::string to_utf8(const std::u32string& text)
