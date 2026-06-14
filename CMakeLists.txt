@@ -6,6 +6,29 @@ project(
     LANGUAGES CXX
 )
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  message("using GCC version: ${CMAKE_CXX_COMPILER_VERSION}")
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13.3)
+    message(FATAL_ERROR "Error: GCC version must be 13.3 or higher")
+  endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  message("using Clang version: ${CMAKE_CXX_COMPILER_VERSION}")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0)
+    message(FATAL_ERROR "Error: Clang version must be 18.0 or higher")
+  endif()
+endif()
+
+if(MSVC)
+  message("using MSVC version: ${MSVC_VERSION}")
+  if(MSVC_VERSION LESS 1944)
+    message(FATAL_ERROR "Error: MSVC version must be 19.44 or higher")
+  endif()
+endif()
+
+
+
 # set(CMAKE_CXX_STANDARD 23)
 # set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
