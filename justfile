@@ -180,11 +180,19 @@ clean:
     Remove-Item -Verbose *_text_file.txt
     Remove-Item -Verbose -Recurse -Force logs
 
-[doc("💥 Clean build files)")]
+[doc("💥 Clean artifacts (debug)")]
 [group("Maintenance")]
-clean-build: clean
+clean-d: clean
     cmake --build --preset debug --target clean
+
+[doc("💥 Clean artifacts (release)")]
+[group("Maintenance")]
+clean-r: clean
     cmake --build --preset release --target clean
+
+[doc("💥 Clean build files (all)")]
+[group("Maintenance")]
+clean-build: clean clean-d clean-r
 
 [doc("💥 Clean everything (build + generated files)")]
 [group("Maintenance")]
