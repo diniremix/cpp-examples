@@ -1,18 +1,18 @@
 include(CMakeParseArguments)
 
 function(add_exercise NAME)
-    set(options
+  set(options
         USE_INCLUDE
         HAS_FMT
     )
 
-    set(oneValueArgs)
+  set(oneValueArgs)
 
-    set(multiValueArgs
+  set(multiValueArgs
         LIBS
     )
 
-    cmake_parse_arguments(
+  cmake_parse_arguments(
         EX
         "${options}"
         "${oneValueArgs}"
@@ -20,12 +20,12 @@ function(add_exercise NAME)
         ${ARGN}
     )
 
-    add_executable(
+  add_executable(
         ${NAME}
         ${PROJECT_SOURCE_DIR}/exercises/${NAME}.cpp
     )
 
-    target_link_libraries(
+  target_link_libraries(
         ${NAME}
         PRIVATE
             project_options
@@ -34,29 +34,29 @@ function(add_exercise NAME)
             fmt::fmt
     )
 
-    if(EX_USE_INCLUDE)
-        target_include_directories(
+  if(EX_USE_INCLUDE)
+    target_include_directories(
             ${NAME}
             PRIVATE
                 ${PROJECT_SOURCE_DIR}/include
         )
-    endif()
+  endif()
 
-    if(EX_HAS_FMT)
-        target_compile_definitions(
+  if(EX_HAS_FMT)
+    target_compile_definitions(
             ${NAME}
             PRIVATE
                 HAS_FMT=1
         )
-    endif()
+  endif()
 
-    if(EX_LIBS)
-        target_link_libraries(
+  if(EX_LIBS)
+    target_link_libraries(
             ${NAME}
             PRIVATE
                 ${EX_LIBS}
         )
-    endif()
+  endif()
 
 endfunction()
 

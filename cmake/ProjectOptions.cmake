@@ -16,7 +16,7 @@ option(
 
 option(
     WARNINGS_AS_ERRORS
-    "Treat warnings as errors"
+    "All warnings being treated as errors"
     OFF
 )
 

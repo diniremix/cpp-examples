@@ -9,24 +9,24 @@ file(
 
 foreach(EXERCISE ${EXERCISES})
 
-    get_filename_component(
+  get_filename_component(
         EXERCISE_NAME
         ${EXERCISE}
         NAME_WE
     )
 
-    add_executable(
+  add_executable(
         ${EXERCISE_NAME}
         ${EXERCISE}
     )
 
-    target_include_directories(
+  target_include_directories(
         ${EXERCISE_NAME}
         PRIVATE
             ${PROJECT_SOURCE_DIR}/include
     )
 
-    target_link_libraries(
+  target_link_libraries(
         ${EXERCISE_NAME}
         PRIVATE
             project_options
@@ -34,12 +34,12 @@ foreach(EXERCISE ${EXERCISES})
             ${COMMON_LIBS}
     )
 
-    target_compile_definitions(
+  target_compile_definitions(
         ${EXERCISE_NAME}
         PRIVATE
             HAS_FMT=1
     )
 
-    endif()
+  endif()
 
 endforeach()
