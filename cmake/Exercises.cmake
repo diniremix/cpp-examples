@@ -163,3 +163,8 @@ add_exercise(terminal)
 add_exercise(ranges)
 add_exercise(concepts)
 add_exercise(namespaces USE_INCLUDE)
+add_exercise(date_time
+    LIBS
+        date::date
+        date::date-tz
+)
