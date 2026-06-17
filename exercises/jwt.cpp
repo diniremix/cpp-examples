@@ -15,6 +15,79 @@
 using namespace std;
 namespace fs = std::filesystem;
 
+struct UserData {
+    int user_id;
+    std::string user_name;
+    int role_id;
+    std::string role_name;
+    int company_id;
+    std::string company_name;
+};
+
+picojson::value to_json(const UserData& d)
+{
+    picojson::object obj;
+
+    obj["user_id"] = picojson::value(static_cast<double>(d.user_id));
+    obj["user_name"] = picojson::value(d.user_name);
+
+    obj["role_id"] = picojson::value(static_cast<double>(d.role_id));
+    obj["role_name"] = picojson::value(d.role_name);
+
+    obj["company_id"] = picojson::value(static_cast<double>(d.company_id));
+    obj["company_name"] = picojson::value(d.company_name);
+
+    return picojson::value(obj);
+}
+
+UserData parse_user_data(const picojson::value& v)
+{
+    if (!v.is<picojson::object>()) {
+        throw std::runtime_error("claim_data must be object");
+    }
+
+    const auto& obj = v.get<picojson::object>();
+
+    auto get_str = [&](const std::string& key) -> std::string {
+        auto it = obj.find(key);
+        if (it == obj.end() || !it->second.is<std::string>()) {
+            throw std::runtime_error("claim_data missing or invalid field: " + key);
+        }
+        return it->second.get<std::string>();
+    };
+
+    auto get_int = [&](const std::string& key) -> int {
+        auto it = obj.find(key);
+        if (it == obj.end() || !it->second.is<double>()) {
+            throw std::runtime_error("claim_data missing or invalid field: " + key);
+        }
+        return static_cast<int>(it->second.get<double>());
+    };
+
+    return UserData{.user_id = get_int("user_id"),
+                    .user_name = get_str("user_name"),
+                    .role_id = get_int("role_id"),
+                    .role_name = get_str("role_name"),
+                    .company_id = get_int("company_id"),
+                    .company_name = get_str("company_name")};
+}
+
+void validate_user_data(const UserData& d)
+{
+    if (d.user_id <= 0)
+        throw std::runtime_error("validata claim_data: invalid user_id");
+    if (d.role_id <= 0)
+        throw std::runtime_error("validata claim_data: invalid role_id");
+    if (d.company_id <= 0)
+        throw std::runtime_error("validata claim_data: invalid company_id");
+
+    if (d.user_name.empty())
+        throw std::runtime_error("validata claim_data: empty user_name");
+    if (d.role_name.empty())
+        throw std::runtime_error("validata claim_data: empty role_name");
+}
+
+// =========
 std::string read_file(const fs::path& path)
 {
     fmt::println("loading: '{}'", path.string());
@@ -200,7 +273,7 @@ namespace token_service {
                 throw std::runtime_error(error);
             }
 
-            // 7.
+            // 7. JTI
             if (!decoded.has_payload_claim("jti")) {
                 throw std::runtime_error("missing jti");
             }
@@ -232,6 +305,16 @@ namespace token_service {
             if (!decoded.has_payload_claim("data")) {
                 throw std::runtime_error("missing data");
             }
+
+            try {
+                auto data_claim = decoded.get_payload_claim("data");
+
+                UserData data = parse_user_data(data_claim.to_json());
+                validate_user_data(data);
+            } catch (const std::exception& e) {
+                auto error = fmt::format("invalid data: {}", e.what());
+                throw std::runtime_error(error);
+            }
         }
 
       private:
@@ -254,13 +337,14 @@ int main()
 
     auto username = "john_connor";
 
-    picojson::object obj;
-    obj["company_id"] = picojson::value(1.0);
-    obj["company_name"] = picojson::value("Home Inside Inc.");
-    obj["role_id"] = picojson::value(2.0);
-    obj["role_name"] = picojson::value("ADMIN");
-    obj["user_id"] = picojson::value(3.0);
-    obj["user_name"] = picojson::value(username);
+    UserData data{.user_id = 1,
+                  .user_name = username,
+                  .role_id = 2,
+                  .role_name = "ADMIN",
+                  .company_id = 3,
+                  .company_name = "Home Inside Inc."};
+
+    auto json_data = to_json(data);
 
     auto uidv4 = naive_uuid::uuid_v4();
 
@@ -269,7 +353,7 @@ int main()
                                 .iat = chrono::system_clock::now(),
                                 .nbf = chrono::system_clock::now(),
                                 .exp = chrono::system_clock::now() + chrono::minutes(15),
-                                .data = picojson::value(obj)};
+                                .data = json_data};
 
     auto token = service.generate(c);
     fmt::println("");
