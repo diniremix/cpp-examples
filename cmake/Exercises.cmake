@@ -175,4 +175,5 @@ add_exercise(jwt
         nlohmann_json::nlohmann_json
         date::date
         date::date-tz
+        unofficial-sodium::sodium
 )

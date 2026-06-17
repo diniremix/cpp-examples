@@ -8,6 +8,7 @@
 #include <jwt-cpp/jwt.h>
 #include <jwt-cpp/traits/kazuho-picojson/defaults.h>
 #include <picojson/picojson.h>
+#include <sodium.h>
 #include <stdexcept>
 #include <string>
 
@@ -35,22 +36,49 @@ static std::string env(std::string_view key)
     return v;
 }
 
-namespace token_service {
-    /*static constexpr auto IMPLICIT_ASSERT = "api.dione.org";
-    static constexpr auto ISSUER = "Dione Api";
-    static constexpr auto AUDIENCE = "https://example.com/dione";
-    static constexpr auto PASETO_TOKEN_TYPE = "v4.public.";*/
+namespace naive_uuid {
 
+    uint64_t unix_time_ms()
+    {
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+    }
+
+    std::string print_v4(const std::array<unsigned char, 16>& id)
+    {
+        return fmt::format("{:02x}{:02x}{:02x}{:02x}-"
+                           "{:02x}{:02x}-"
+                           "{:02x}{:02x}-"
+                           "{:02x}{:02x}-"
+                           "{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+                           id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7], id[8], id[9], id[10], id[11], id[12],
+                           id[13], id[14], id[15]);
+    }
+
+    std::string uuid_v4()
+    {
+        std::array<unsigned char, 16> id;
+
+        randombytes_buf(id.data(), id.size());
+
+        // version 4 -> xxxx0100
+        id[6] = (id[6] & 0x0F) | 0x40;
+
+        // variant RFC 4122 -> 10xxxxxx
+        id[8] = (id[8] & 0x3F) | 0x80;
+
+        return print_v4(id);
+    }
+
+} // namespace naive_uuid
+
+namespace token_service {
     inline constexpr std::string_view IMPLICIT_ASSERT = "api.dione.org";
     inline constexpr std::string_view ISSUER = "Dione Api";
     inline constexpr std::string_view AUDIENCE = "https://example.com/dione";
     inline constexpr std::string_view TOKEN_TYPE = "v4.public.";
 
     struct JwtConfig {
-        // std::string issuer;
-        // std::string audience;
-        // std::string context;
-        // std::string secret;
         std::string private_key;
         std::string public_key;
     };
@@ -83,8 +111,6 @@ namespace token_service {
                 .set_expires_at(c.exp)
                 .set_payload_claim("ctx", jwt::claim(std::string(IMPLICIT_ASSERT)))
                 .set_payload_claim("data", jwt::claim(c.data))
-                //.sign(jwt::algorithm::hs256{cfg.secret});
-                //.sign(jwt::algorithm::ed25519{public_key_pem, private_key_pem});
                 .sign(jwt::algorithm::ed25519{cfg.public_key, cfg.private_key});
         }
 
@@ -93,8 +119,6 @@ namespace token_service {
             auto decoded = jwt::decode(token);
 
             jwt::verify()
-                //.allow_algorithm(jwt::algorithm::hs256{cfg.secret})
-                //.allow_algorithm(jwt::algorithm::ed25519{public_key_pem})
                 .allow_algorithm(jwt::algorithm::ed25519{cfg.public_key})
                 .with_issuer(std::string(ISSUER))
                 .with_audience(std::string(AUDIENCE))
@@ -115,26 +139,21 @@ int main()
     fmt::println("JWT example");
 
     dotenv::load(".env");
-    auto private_key = read_file(env("JWT_PRIVATE_KEY_FILE"));
 
+    auto private_key = read_file(env("JWT_PRIVATE_KEY_FILE"));
     auto public_key = read_file(env("JWT_PUBLIC_KEY_FILE"));
 
-    /*
-    .issuer = "Dione Api",
-    .audience = "https://example.com/dione",
-    .context = "api.dione.org",
-    .secret = env("JWT_SECRET_KEY")
-    */
     token_service::JwtConfig cfg(public_key, private_key);
-
     token_service::JwtService service(cfg);
 
     picojson::object obj;
     obj["user_id"] = picojson::value(1.0);
     obj["role"] = picojson::value("admin");
 
+    auto uidv4 = naive_uuid::uuid_v4();
+
     token_service::ClaimsData c{.sub = "123",
-                                .jti = "uuid-1",
+                                .jti = uidv4,
                                 .iat = std::chrono::system_clock::now(),
                                 .nbf = std::chrono::system_clock::now(),
                                 .exp = std::chrono::system_clock::now() + std::chrono::minutes(15),
