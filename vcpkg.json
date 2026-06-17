@@ -10,6 +10,10 @@
     "blake3",
     "cli11",
     "cpr",
+    {
+      "name": "date",
+      "default-features": false
+    },
     "fmt",
     "libsodium",
     "nlohmann-json",
@@ -18,8 +22,8 @@
     "sqlitecpp",
     "uni-algo",
     {
-      "name": "date",
-      "default-features": false
+      "name": "jwt-cpp",
+      "features": ["picojson"]
     }
   ]
 }
