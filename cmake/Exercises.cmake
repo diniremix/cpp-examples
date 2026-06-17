@@ -172,8 +172,5 @@ add_exercise(jwt
     USE_INCLUDE
     LIBS
         jwt-cpp::jwt-cpp
-        nlohmann_json::nlohmann_json
-        date::date
-        date::date-tz
         unofficial-sodium::sodium
 )

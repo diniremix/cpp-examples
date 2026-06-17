@@ -8,7 +8,7 @@
  * - sodium (uuid)
  * - dotenv
  *
- * algortimo(Firma/verificación): Ed25519
+ * algoritmo(firma/verificación): Ed25519
  * validación estricta de los campos:
  * - 1. issuer(iss): definido explicitamente
  * - 2. audience(aud): definido explicitamente
@@ -28,8 +28,8 @@
  * `openssl pkey -in private_key.pem -pubout -out public_key.pem`
  *
  * variables de entorno utilizadas:
- * - `JWT_PRIVATE_KEY_FILE=/path/to/public_key.pem`
- * - `JWT_PUBLIC_KEY_FILE=/path/to/private_key.pem`
+ * - `JWT_PRIVATE_KEY_FILE=/path/to/private_key.pem`
+ * - `JWT_PUBLIC_KEY_FILE=/path/to/public_key.pem`
  * - `JWT_KEY_TOKEN=awesome_jwt_token_to_validate`
  */
 
@@ -150,7 +150,8 @@ namespace naive_uuid {
     uint64_t unix_time_ms()
     {
 
-        return duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+        return static_cast<uint64_t>(
+            chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count());
     }
 
     std::string print_v4(const std::array<unsigned char, 16>& id)
@@ -206,7 +207,7 @@ namespace token_service {
     class JwtService
     {
       public:
-        explicit JwtService(const JwtConfig& cfg) : cfg(cfg) {}
+        explicit JwtService(const JwtConfig& config) : cfg(config) {}
 
         std::string generate(const ClaimsData& c)
         {
@@ -237,6 +238,7 @@ namespace token_service {
                     throw std::runtime_error(std::string("invalid signature: ") + e.what());
                 }
              */
+
             auto decoded = jwt::decode(token);
 
             try {
@@ -367,7 +369,7 @@ int main()
     auto private_key = read_file(load_env("JWT_PRIVATE_KEY_FILE"));
     auto public_key = read_file(load_env("JWT_PUBLIC_KEY_FILE"));
 
-    token_service::JwtConfig cfg(public_key, private_key);
+    token_service::JwtConfig cfg(private_key, public_key);
     token_service::JwtService service(cfg);
 
     auto username = "john_connor";
@@ -393,7 +395,7 @@ int main()
     auto token = service.generate(c);
     fmt::println("");
 
-    fmt::println("TOKEN: {}", token);
+    fmt::println("new TOKEN: {}", token);
     fmt::println("");
 
     service.verify(token);
@@ -404,7 +406,7 @@ int main()
     fmt::println("");
     auto token_key = load_env("JWT_KEY_TOKEN");
 
-    fmt::println("token_key: {}", token_key);
+    fmt::println("token_key to validate: '{}'", token_key);
 
     service.verify(token_key);
     fmt::println("validation OK");

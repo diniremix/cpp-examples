@@ -39,7 +39,7 @@ namespace naive_uuid {
     uint64_t unix_time_ms()
     {
         using namespace std::chrono;
-        return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        return static_cast<uint64_t>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
     }
 
     std::string print_v7(const std::array<unsigned char, 16>& id)
