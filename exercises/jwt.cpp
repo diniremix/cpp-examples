@@ -1,3 +1,38 @@
+/*
+ * Este ejercicio implementa una capa de JWT estricta, inspirada en
+ * PASETO v4, reduciendo la flexibilidad peligrosa de JWT y
+ * forzando un contrato explícito de autenticación.
+ * librerías utilizadas:
+ * - jwt-cpp
+ * - picojson
+ * - sodium (uuid)
+ * - dotenv
+ *
+ * algortimo(Firma/verificación): Ed25519
+ * validación estricta de los campos:
+ * - 1. issuer(iss): definido explicitamente
+ * - 2. audience(aud): definido explicitamente
+ * - 3. expiration(exp)
+ * - 4. not before(nbf)
+ * - 5. issued at(iat) validando anti clock-skew/ token futuro
+ * - 6. ctx (implicit assertion equivalente a PASETO V4)
+ * - 7. jti: UUID v4 (con prefijo adicional)
+ * - 8. sub: campo obligatorio
+ * - 9. data: estructura tipada del payload "data", campo obligatorio
+ *
+ * las claves privadas y públicas, se generan con openSSL y se
+ * cargan desde archivos `.pem`
+ * - generar llave privada:
+ * `openssl genpkey -algorithm ed25519 -out private_key.pem`
+ * - generar llave pública:
+ * `openssl pkey -in private_key.pem -pubout -out public_key.pem`
+ *
+ * variables de entorno utilizadas:
+ * - `JWT_PRIVATE_KEY_FILE=/path/to/public_key.pem`
+ * - `JWT_PUBLIC_KEY_FILE=/path/to/private_key.pem`
+ * - `JWT_KEY_TOKEN=awesome_jwt_token_to_validate`
+ */
+
 #include "dotenv.hpp"
 
 #include <chrono>
@@ -23,22 +58,6 @@ struct UserData {
     int company_id;
     std::string company_name;
 };
-
-picojson::value to_json(const UserData& d)
-{
-    picojson::object obj;
-
-    obj["user_id"] = picojson::value(static_cast<double>(d.user_id));
-    obj["user_name"] = picojson::value(d.user_name);
-
-    obj["role_id"] = picojson::value(static_cast<double>(d.role_id));
-    obj["role_name"] = picojson::value(d.role_name);
-
-    obj["company_id"] = picojson::value(static_cast<double>(d.company_id));
-    obj["company_name"] = picojson::value(d.company_name);
-
-    return picojson::value(obj);
-}
 
 UserData parse_user_data(const picojson::value& v)
 {
@@ -85,6 +104,22 @@ void validate_user_data(const UserData& d)
         throw std::runtime_error("validata claim_data: empty user_name");
     if (d.role_name.empty())
         throw std::runtime_error("validata claim_data: empty role_name");
+}
+
+picojson::value to_json(const UserData& d)
+{
+    picojson::object obj;
+
+    obj["user_id"] = picojson::value(static_cast<double>(d.user_id));
+    obj["user_name"] = picojson::value(d.user_name);
+
+    obj["role_id"] = picojson::value(static_cast<double>(d.role_id));
+    obj["role_name"] = picojson::value(d.role_name);
+
+    obj["company_id"] = picojson::value(static_cast<double>(d.company_id));
+    obj["company_name"] = picojson::value(d.company_name);
+
+    return picojson::value(obj);
 }
 
 // =========
