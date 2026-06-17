@@ -571,3 +571,9 @@ test/*
 *.csv
 *_example.bin
 logs/*
+
+# for JWT and OpenSSL
+.env
+.env.*
+*.pem
+*.hex
