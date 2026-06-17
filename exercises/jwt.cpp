@@ -27,7 +27,7 @@ std::string read_file(const fs::path& path)
     return {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
 }
 
-static std::string env(std::string_view key)
+static std::string load_env(std::string_view key)
 {
     const char* v = std::getenv(key.data());
     if (!v) {
@@ -140,20 +140,26 @@ int main()
 
     dotenv::load(".env");
 
-    auto private_key = read_file(env("JWT_PRIVATE_KEY_FILE"));
-    auto public_key = read_file(env("JWT_PUBLIC_KEY_FILE"));
+    auto private_key = read_file(load_env("JWT_PRIVATE_KEY_FILE"));
+    auto public_key = read_file(load_env("JWT_PUBLIC_KEY_FILE"));
 
     token_service::JwtConfig cfg(public_key, private_key);
     token_service::JwtService service(cfg);
 
+    auto username = "john_connor";
+
     picojson::object obj;
-    obj["user_id"] = picojson::value(1.0);
-    obj["role"] = picojson::value("admin");
+    obj["company_id"] = picojson::value(1.0);
+    obj["company_name"] = picojson::value("Home Inside Inc.");
+    obj["role_id"] = picojson::value(2.0);
+    obj["role_name"] = picojson::value("ADMIN");
+    obj["user_id"] = picojson::value(3.0);
+    obj["user_name"] = picojson::value(username);
 
     auto uidv4 = naive_uuid::uuid_v4();
 
-    token_service::ClaimsData c{.sub = "123",
-                                .jti = uidv4,
+    token_service::ClaimsData c{.sub = username,
+                                .jti = fmt::format("rt_{}", uidv4),
                                 .iat = std::chrono::system_clock::now(),
                                 .nbf = std::chrono::system_clock::now(),
                                 .exp = std::chrono::system_clock::now() + std::chrono::minutes(15),
