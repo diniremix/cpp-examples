@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <fmt/core.h>
 #include <jwt-cpp/jwt.h>
+#include <jwt-cpp/traits/kazuho-picojson/defaults.h>
+#include <picojson/picojson.h>
 #include <stdexcept>
 #include <string>
 
@@ -22,7 +24,7 @@ struct ClaimsData {
     std::chrono::system_clock::time_point nbf;
     std::chrono::system_clock::time_point exp;
 
-    std::string data_json; // simplificado para evitar nlohmann dependencia aquí
+    picojson::value data;
 };
 
 static std::string env(std::string_view key)
@@ -37,7 +39,7 @@ static std::string env(std::string_view key)
 class JwtService
 {
   public:
-    explicit JwtService(const JwtConfig& cfg) : cfg(cfg) {}
+    explicit JwtService(const JwtConfig& cfg_) : cfg(cfg_) {}
 
     std::string generate(const ClaimsData& c)
     {
@@ -50,7 +52,7 @@ class JwtService
             .set_not_before(c.nbf)
             .set_expires_at(c.exp)
             .set_payload_claim("ctx", jwt::claim(cfg.context))
-            .set_payload_claim("data", jwt::claim(c.data_json))
+            .set_payload_claim("data", jwt::claim(c.data))
             .sign(jwt::algorithm::hs256{cfg.secret});
     }
 
@@ -86,12 +88,16 @@ int main()
 
     JwtService service(cfg);
 
+    picojson::object obj;
+    obj["user_id"] = picojson::value(1.0);
+    obj["role"] = picojson::value("admin");
+
     ClaimsData c{.sub = "123",
                  .jti = "uuid-1",
                  .iat = std::chrono::system_clock::now(),
                  .nbf = std::chrono::system_clock::now(),
                  .exp = std::chrono::system_clock::now() + std::chrono::minutes(15),
-                 .data_json = R"({"user_id":1,"role":"admin"})"};
+                 .data = picojson::value(obj)};
 
     auto token = service.generate(c);
     fmt::println("TOKEN: {}", token);
