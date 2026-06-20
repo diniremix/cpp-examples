@@ -1,6 +1,6 @@
 # CPP exercises
 
-Simple exercises for learning modern C++ [C++ 20 and above](https://isocpp.org/).
+Simple exercises for learning modern C++ ([C++ 20 and above](https://isocpp.org/)).
 
 
 ## Requirements
@@ -11,6 +11,7 @@ Simple exercises for learning modern C++ [C++ 20 and above](https://isocpp.org/)
  - [Ninja](https://ninja-build.org/) **1.11.x** and above
 
 ## Recommended tools
+ - [xmake](https://xmake.io/) **3.0.6.x** and above
  - [just](https://github.com/casey/just) **1.47.x** and above
  - [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
  - [clang-tidy](https://clang.llvm.org/extra/clang-tidy/)

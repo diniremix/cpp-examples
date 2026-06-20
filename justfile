@@ -248,26 +248,38 @@ gitc:
 # ============================================================================
 # Xmake recipes
 # ============================================================================
-# XMAKE_BUILD_DIR
+
+[doc("🔧 enable sanitizers")]
+[group("Configure")]
+config-sanitizers:
+    xmake f --enable_sanitizers=y
+
+[doc("🔧 enable warnings as errors")]
+[group("Configure")]
+config-warnings:
+    xmake f --warnings_as_errors=y
+
 cleanx:
     rm -rf {{ XMAKE_BUILD_DIR }}/*
     xmake clean
 
-destroyx: clean
+destroyx: cleanx
     # rm -rf ~/.xmake/cache/packages/
     # rm -rf ~/.xmake/
     # xmake config --clean && xmake f -c --all
     xmake config --clean
 
-configx:
+configx: config-sanitizers
     # xmake f -P ./
     xmake f -o {{ XMAKE_BUILD_DIR }}
-    xmake config && xmake f -c
+    xmake config
+    xmake f -y
 
 buildx-all:
     xmake build -jv
 
 buildx target:
+    # xmake build -jvrD {{ target }}
     xmake build -jv {{ target }}
 
 runx target:
@@ -277,8 +289,13 @@ runx target:
 infox target:
     xrepo info "{{ target }}"
 
+targetsx:
+    # xmake show --info=depgraph --format=dot
+    xmake show --info=depgraph
+
 depsx:
-    xmake show --info=depgraph --format=dot
+    # xmake require --depgraph --format=dot
+    xmake require --depgraph
 
 # generar compile_commands para clangd
 _gen_compilex:
