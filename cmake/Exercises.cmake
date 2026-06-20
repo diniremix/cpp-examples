@@ -120,7 +120,7 @@ add_exercise(
     rest_client
     LIBS
         cpr::cpr
-        unofficial::sqlite3::sqlite3
+        nlohmann_json::nlohmann_json
 )
 add_exercise(result_error)
 add_exercise(socket_client)
