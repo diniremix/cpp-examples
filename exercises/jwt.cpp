@@ -42,7 +42,7 @@
 #include <fstream> // Para ifstream, ofstream, fstream
 #include <jwt-cpp/jwt.h>
 #include <jwt-cpp/traits/kazuho-picojson/defaults.h>
-#include <picojson/picojson.h>
+#include <picojson.h>
 #include <sodium.h>
 #include <stdexcept>
 #include <string>
