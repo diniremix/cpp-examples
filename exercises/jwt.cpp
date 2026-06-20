@@ -42,7 +42,14 @@
 #include <fstream> // Para ifstream, ofstream, fstream
 #include <jwt-cpp/jwt.h>
 #include <jwt-cpp/traits/kazuho-picojson/defaults.h>
-#include <picojson.h>
+
+#if __has_include(<picojson.h>)
+    #pragma message("picojson from xmake")
+    #include <picojson.h>
+#else
+    #include <picojson/picojson.h>
+#endif
+
 #include <sodium.h>
 #include <stdexcept>
 #include <string>
