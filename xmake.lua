@@ -2,26 +2,26 @@ set_xmakever("3.0.6")
 add_rules("mode.debug", "mode.release")
 set_policy("package.precompiled", true)
 includes("@builtin/xpack")
+--
 includes("xmake")
-
+includes("xmake/dependencies_git.lua")
+--
 set_project("hello-cpp")
 set_version("0.6.0")
 set_description("A C++23 examples")
-
+--
 set_rundir("$(projectdir)")
 set_installdir("dist")
-
+--
 -- set_languages("cxx20","cxx23")
 set_languages("cxx23")
-set_arch("x64")
-
+-- set_arch("x64")
+--
 -- dependencies
-add_defines("ASIO_STANDALONE")
-add_defines("DNLOHMANN_JSON_HAS_STD_OPTIONAL=1")
+--add_defines("ASIO_STANDALONE")
 add_requires(
     "fmt",
     "spdlog",
-    "nlohmann_json",
     "sqlite3",
     "sqlitecpp",
     "cli11",
@@ -30,22 +30,17 @@ add_requires(
     "date",
     "libsodium"
 )
-add_requires(
-    "uni_algo",
-    {
-        configs = {
-            header_only = true
-        }
-    }
-)
 --
--- Usa solo una versión de OpenSSL para todo
--- add_requires("openssl 1.1.1-w", {system = false})
--- add_requires("cpr", {configs = {ssl = true}})
+-- add_requires("nlohmann_json")
+--
+add_requires("uni_algo",{configs = {header_only = true}})
 --
 add_requires("picojson")
 add_requires("jwt-cpp", {configs = {picojson = true, ssl = "openssl3"}})
-
+--
+--add_requires("openssl3", {system = false})
+add_requires("cpr", {configs = {ssl = true}, system = false})
+--
 -- enable options by xmake flags
 option("enable_sanitizers")
     set_default(false)
@@ -68,17 +63,12 @@ end
 
 -- rules
 rule("config_options")
-    -- print("entro config options")
     on_load(function (target)
-        -- print("aplicando options")
         local tc = target:toolchain("gcc", "clang")
         local name = tc and tc:name()
-        -- print("tc name:", name)
 
         -- activable manualmente con `xmake f --enable-sanitizers=y`
         if has_config("enable_sanitizers") then
-            -- print("Sanitizers enabled")
-
             if name == "gcc" or name == "clang" then
                 target:add("cxflags",
                     "-fsanitize=address",
@@ -95,8 +85,6 @@ rule("config_options")
 
         -- activable manualmente con `xmake f --warnings-as-errors=y`
         if has_config("warnings_as_errors") then
-            -- print("Warnings as errors enabled")
-
             if name == "gcc" or name == "clang" then
                 target:add("cxflags","-Werror")
             elseif name == "msvc" then
@@ -106,12 +94,9 @@ rule("config_options")
     end)
 
 rule("config_base")
-    -- print("entro config base")
     on_load(function (target)
-        -- print("aplicando flags base")
         local tc = target:toolchain("gcc", "clang")
         local name = tc and tc:name()
-        -- print("tc name:", name)
 
         if name == "gcc" or name == "clang" then
             target:add("cxflags",
@@ -150,9 +135,8 @@ rule("config_release")
     -- print("entro config release")
     on_load(function(target)
         local tc = target:toolchain("gcc", "clang")
-
         local name = tc and tc:name()
-        -- print("tc name:", name)
+
         if name == "gcc" or name == "clang" then
             target:add("cxflags", "-fstack-protector-strong")
             target:set("optimize", "fastest")
@@ -173,9 +157,8 @@ target("hello_cpp")
     if is_mode("release") then
         add_rules("config_release")
     end
-    --
+
     add_includedirs("src", {public = false})
-    -- add_includedirs("include", {public = false})
 
     add_headerfiles("include/**.hpp")
 
