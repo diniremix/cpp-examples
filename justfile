@@ -243,3 +243,31 @@ add lib:
 [group("Git")]
 gitc:
     git fsck && git gc --prune=now --aggressive && git count-objects -vH
+
+# ============================================================================
+# Xmake recipes
+# ============================================================================
+
+cleanx:
+    rm -rf build/*
+    xmake clean
+
+destroyx: clean
+    # rm -rf ~/.xmake/cache/packages/
+    # rm -rf ~/.xmake/
+    # xmake config --clean && xmake f -c --all
+    xmake config --clean
+
+configx:
+    xmake config && xmake f -c
+buildx-all:
+    xmake build -jv
+buildx target:
+    xmake build -jv {{ target }}
+runx target:
+    # xmake run -v {{ target }}
+    xmake run {{ target }}
+infox target:
+    xrepo info "{{ target }}"
+depsx:
+    xmake show --info=depgraph --format=dot
