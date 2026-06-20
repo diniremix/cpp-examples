@@ -20,10 +20,9 @@ function add_exercise(name, opts)
             add_packages(table.unpack(opts.packages))
         end
 
+        -- librerias por defecto
         add_packages(
-            "fmt",
-            "nlohmann_json",
-            "spdlog"
+            "fmt"
         )
     target_end()
 end
@@ -34,7 +33,6 @@ add_exercise("bin_pod_files")
 add_exercise("caesar_cipher")
 add_exercise("chars",{
     packages = {
-        "fmt",
         "uni_algo"
     }
 })
@@ -59,15 +57,14 @@ add_exercise("find_primes")
 add_exercise("fizzbuzz")
 add_exercise("formatter",{
         include = true,
-        defines = { "HAS_FMT=1" },
-        packages = { "fmt"}
+        defines = { "HAS_FMT=1" }
     }
 )
 add_exercise("haversine")
 add_exercise("logger",{
         packages = {
-            "fmt",
-            "spdlog"
+            "spdlog",
+            "nlohmann_json_git"
         }
     }
 )
@@ -75,77 +72,67 @@ add_exercise("loops")
 add_exercise("matrix_struct")
 add_exercise("morse",{
     packages = {
-        "fmt",
         "uni_algo"
     }
 })
--- add_exercise(
---     "open_meteo",
---     {
---         packages = {
---             "fmt",
---             "cpr",
---             "nlohmann_json"
---         }
---     }
--- )
+add_exercise(
+    "open_meteo",
+    {
+        packages = {
+            "cpr",
+            -- "nlohmann_json"
+            "nlohmann_json_git"
+        }
+    }
+)
 add_exercise("print")
 add_exercise("read_text_files")
 add_exercise("regex_demo")
--- add_exercise("rest_client",{
---         packages = {
---             "fmt",
---             "cpr",
---             "nlohmann_json"
---         }
---     }
--- )
+add_exercise("rest_client",{
+        packages = {
+            "cpr",
+            -- "nlohmann_json"
+            "nlohmann_json_git"
+        }
+    }
+)
 add_exercise("result_error")
 add_exercise("socket_client")
 add_exercise("socket_server")
 add_exercise("sqlite_demo", {
     packages = {
-        "fmt",
         "sqlite3",
     }
 })
 add_exercise("sqlite_orm_demo",{
         packages = {
-            "fmt",
             "sqlitecpp",
         }
     })
 add_exercise("structs",{
         include = true,
-        packages = {
-            "fmt"
-        }
     }
 )
 add_exercise("testing")
 add_exercise("thread_simple")
 add_exercise("base_x",{
     packages = {
-        "fmt",
         "libsodium",
     }
 })
 add_exercise("crypt",{
     packages = {
-        "fmt",
         "libsodium",
     }
 })
 add_exercise("hashing",{
     packages = {
-        "fmt",
         "blake3",
         "libsodium",
     }
 })
 add_exercise("rand_uuid",{
     packages = {
-        "fmt",
         "libsodium",
     }
 })
@@ -155,7 +142,6 @@ add_exercise("concepts")
 add_exercise("namespaces",  {include = true})
 add_exercise("date_time",{
         packages = {
-            "fmt",
             "date",
             "date-tz",
         }
@@ -163,6 +149,6 @@ add_exercise("date_time",{
 )
 add_exercise("jwt",{
         include=true,
-        packages = { "fmt", "jwt-cpp", "picojson", "libsodium"}
+        packages = {"jwt-cpp", "picojson", "libsodium"}
     }
 )
