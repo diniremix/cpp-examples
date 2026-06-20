@@ -577,3 +577,6 @@ logs/*
 .env.*
 *.pem
 *.hex
+# xmake
+.xmake/*
+build-c/*

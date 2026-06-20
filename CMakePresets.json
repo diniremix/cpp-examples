@@ -10,7 +10,7 @@
       "name": "default",
       "hidden": true,
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/${presetName}",
+      "binaryDir": "${sourceDir}/build_cmake/${presetName}",
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "VCPKG_MANIFEST_MODE": "ON"
