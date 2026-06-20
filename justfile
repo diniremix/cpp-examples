@@ -12,7 +12,8 @@ set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
 # globals vars
 
 PROJECT_NAME := "hello_cpp"
-BUILD_DIR := "build"
+CMAKE_BUILD_DIR := "build_cmake"
+XMAKE_BUILD_DIR := "build_xmake"
 
 # ============================================================================
 # Default
@@ -62,12 +63,12 @@ rebuild: clean-build configure build
 [doc("▶️  Run main app (debug)")]
 [group("Development")]
 run: build
-    ./{{ BUILD_DIR }}/debug/{{ PROJECT_NAME }}
+    ./{{ CMAKE_BUILD_DIR }}/debug/{{ PROJECT_NAME }}
 
 [doc("▶️  Run main app (release)")]
 [group("Development")]
 run-r: build-r
-    ./{{ BUILD_DIR }}/release/{{ PROJECT_NAME }}
+    ./{{ CMAKE_BUILD_DIR }}/release/{{ PROJECT_NAME }}
 
 # ============================================================================
 # Quick Compilation (Single file, no CMake)
@@ -77,8 +78,8 @@ run-r: build-r
 [group("Development")]
 [unix]
 quick file:
-    g++ -std=c++23 -I include src/{{ file }}.cpp -o {{ BUILD_DIR }}/{{ file }}
-    ./{{ BUILD_DIR }}/{{ file }}
+    g++ -std=c++23 -I include src/{{ file }}.cpp -o {{ CMAKE_BUILD_DIR }}/{{ file }}
+    ./{{ CMAKE_BUILD_DIR }}/{{ file }}
 
 [doc("⚡ Quick compile single file (no CMake/VCPKG)")]
 [group("Development")]
@@ -100,7 +101,7 @@ list:
 [doc("🎯 Build and run specific exercise")]
 [group("Development")]
 ex name: fmt (build-ex name)
-    ./{{ BUILD_DIR }}/debug/{{ name }}
+    ./{{ CMAKE_BUILD_DIR }}/debug/{{ name }}
 
 [doc("🎯 Build specific exercise without running (debug)")]
 [group("Build")]
@@ -198,13 +199,13 @@ clean-build: clean clean-d clean-r
 [group("Maintenance")]
 [unix]
 clean-all: clean
-    rm -rf {{ BUILD_DIR }}/debug/* {{ BUILD_DIR }}/release/*
+    rm -rf {{ CMAKE_BUILD_DIR }}/debug/* {{ CMAKE_BUILD_DIR }}/release/*
 
 [doc("💥 Clean everything (build + generated files)")]
 [group("Maintenance")]
 [windows]
 clean-all: clean
-    Remove-Item -Recurse -Force {{ BUILD_DIR }}/debug/* , {{ BUILD_DIR }}/release/*
+    Remove-Item -Recurse -Force {{ CMAKE_BUILD_DIR }}/debug/* , {{ CMAKE_BUILD_DIR }}/release/*
 
 # ============================================================================
 # Testing
@@ -213,7 +214,7 @@ clean-all: clean
 [doc("🧪 Run all tests")]
 [group("Testing")]
 test: build
-    ctest --test-dir {{ BUILD_DIR }}/debug --output-on-failure
+    ctest --test-dir {{ CMAKE_BUILD_DIR }}/debug --output-on-failure
 
 # ============================================================================
 # VCPKG Management
@@ -247,9 +248,9 @@ gitc:
 # ============================================================================
 # Xmake recipes
 # ============================================================================
-
+# XMAKE_BUILD_DIR
 cleanx:
-    rm -rf build/*
+    rm -rf {{ XMAKE_BUILD_DIR }}/*
     xmake clean
 
 destroyx: clean
@@ -259,15 +260,40 @@ destroyx: clean
     xmake config --clean
 
 configx:
+    # xmake f -P ./
+    xmake f -o {{ XMAKE_BUILD_DIR }}
     xmake config && xmake f -c
+
 buildx-all:
     xmake build -jv
+
 buildx target:
     xmake build -jv {{ target }}
+
 runx target:
     # xmake run -v {{ target }}
     xmake run {{ target }}
+
 infox target:
     xrepo info "{{ target }}"
+
 depsx:
     xmake show --info=depgraph --format=dot
+
+# generar compile_commands para clangd
+_gen_compilex:
+    xmake project -k compile_commands
+
+[doc("📁 Generate compile_commands.json for clangd")]
+[group("Build")]
+[unix]
+compilex: _gen_compilex
+    mkdir -pv {{ XMAKE_BUILD_DIR }}/debug
+    mv -v compile_commands.json {{ XMAKE_BUILD_DIR }}/debug
+
+[doc("📁 Generate compile_commands.json for clangd")]
+[windows]
+compilex: _gen_compilex
+    mkdir -Force {{ XMAKE_BUILD_DIR }}/debug | Out-Null
+    Move-Item -Force compile_commands.json {{ XMAKE_BUILD_DIR }}/debug/
+    Write-Host "✅ compile_commands.json moved to {{ XMAKE_BUILD_DIR }}/debug/"
