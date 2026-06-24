@@ -53,7 +53,7 @@ void get_buffer()
 int main(int argc, char* argv[])
 {
     if (argc > 1) {
-        fmt::println("validando argumentos:");
+        fmt::println("validando argumentos: ({})", argc);
 
         for (int i = 1; i < argc; ++i) {
             fmt::println("  {}", argv[i]);
