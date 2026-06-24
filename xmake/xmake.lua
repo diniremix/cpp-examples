@@ -152,3 +152,4 @@ add_exercise("jwt",{
         packages = {"jwt-cpp", "picojson", "libsodium"}
     }
 )
+add_exercise("stdio")
