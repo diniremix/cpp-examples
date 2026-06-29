@@ -1,3 +1,4 @@
+
 # CPP exercises
 
 Simple exercises for learning modern C++ ([C++ 20 and above](https://isocpp.org/)).
@@ -71,6 +72,15 @@ create a new example:
   ```bash
  $ just ex EXERCISE_NAME
  ```
+
+
+##  tested on
+
+|         O.S.         |       compiler               |
+| -------------------- | ---------------------------- |
+| Ubuntu 24.04         |   (GCC 13.3.0)               |
+| Fedora 44            |   (GCC 16.1.1)               |
+| Windows 11           |   (MSVC 19.44.35226 for x64) |
 
 
 ## License
