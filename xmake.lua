@@ -113,6 +113,8 @@ rule("config_base")
                 "-Wnull-dereference",
                 "-Wdouble-promotion",
                 "-Wimplicit-fallthrough",
+                "-Wdeprecated",
+                "-Wdeprecated-declarations",
                 "-Wundef",
                 "-Wformat=2"
             )
