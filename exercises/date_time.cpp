@@ -38,10 +38,14 @@ namespace datetime {
 
         string to_string() const
         {
-            // no funcionan
-            // return date::format("%F", value);
-            // return fmt::format("{}", date::format("%F", value));
-            return date::format("%F", chrono::sys_days{value});
+// no funcionan
+// return date::format("%F", value);
+// return fmt::format("{}", date::format("%F", value));
+#if defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 16
+            return fmt::format("{:%F}", std::chrono::sys_days{value});
+#else
+            return date::format("%F", std::chrono::sys_days{value});
+#endif
         }
 
         string get_year()
@@ -86,7 +90,11 @@ namespace datetime {
 
         string to_string() const
         {
+#if defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 16
+            return fmt::format("{:%F %T}", value);
+#else
             return fmt::format("{}", date::format("%F %T", value));
+#endif
         }
 
         string to_string_tz(string_view tz) const
@@ -101,17 +109,17 @@ namespace datetime {
             // return date::format("%F %T", zt.get_local_time());
             return format_zoned(zt);
         }
+
+        /*Date parse_date(string_view s)
+        {
+            istringstream in{string{s}};
+
+            chrono::sys_days dp;
+            in >> date::parse("%F", dp);
+
+            return Date{chrono::year_month_day{dp}};
+        }*/
     };
-
-    Date parse_date(string_view s)
-    {
-        istringstream in{string{s}};
-
-        chrono::sys_days dp;
-        in >> date::parse("%F", dp);
-
-        return Date{chrono::year_month_day{dp}};
-    }
 
     Time parse_time(string_view s)
     {
@@ -124,15 +132,44 @@ namespace datetime {
         return Time{chrono::hh_mm_ss{chrono::hours{h} + chrono::minutes{m} + chrono::seconds{sec}}};
     }
 
-    DateTime parse_date_time(string_view s)
+    /* DateTime parse_date_time(string_view s)
+     {
+
+         istringstream in{string{s}};
+
+         chrono::sys_seconds tp;
+         in >> date::parse("%F %T", tp);
+
+         return DateTime{tp};
+     }*/
+    Date parse_date(std::string_view s)
     {
+        std::istringstream in{std::string{s}};
 
-        istringstream in{string{s}};
+        std::chrono::sys_days dp;
 
-        chrono::sys_seconds tp;
+#if defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 16
+        std::chrono::from_stream(in, "%F", dp);
+#else
+        in >> date::parse("%F", dp);
+#endif
+
+        return {std::chrono::year_month_day{dp}};
+    }
+
+    DateTime parse_date_time(std::string_view s)
+    {
+        std::istringstream in{std::string{s}};
+
+        std::chrono::sys_seconds tp;
+
+#if defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 16
+        std::chrono::from_stream(in, "%F %T", tp);
+#else
         in >> date::parse("%F %T", tp);
+#endif
 
-        return DateTime{tp};
+        return {tp};
     }
 
 } // namespace datetime
