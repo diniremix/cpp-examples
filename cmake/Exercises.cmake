@@ -174,3 +174,5 @@ add_exercise(jwt
         jwt-cpp::jwt-cpp
         unofficial-sodium::sodium
 )
+add_exercise(stdio)
+add_exercise(mini_mlp)
