@@ -175,3 +175,4 @@ add_exercise(jwt
         unofficial-sodium::sodium
 )
 add_exercise(stdio)
+add_exercise(mini_mlp)

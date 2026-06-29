@@ -153,3 +153,4 @@ add_exercise("jwt",{
     }
 )
 add_exercise("stdio")
+add_exercise("mini_mlp")

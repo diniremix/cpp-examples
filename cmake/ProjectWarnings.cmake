@@ -19,6 +19,8 @@ target_compile_options(
             -Wnull-dereference
             -Wdouble-promotion
             -Wimplicit-fallthrough
+            -Wdeprecated
+            -Wdeprecated-declarations
             -Wundef
             -Wformat=2
             -fdiagnostics-color=always
@@ -42,6 +44,8 @@ target_compile_options(
             -Wnull-dereference
             -Wdouble-promotion
             -Wimplicit-fallthrough
+            -Wdeprecated
+            -Wdeprecated-declarations
             -Wundef
             -Wformat=2
             -fcolor-diagnostics
